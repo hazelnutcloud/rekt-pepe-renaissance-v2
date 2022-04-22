@@ -387,8 +387,8 @@
 
   .background-text {
     font-family: var(--font-family--secondary);
-    font-size: 9rem;
-    line-height: 9rem;
+    font-size: 10rem;
+    line-height: 5rem;
     opacity: 0.3;
     color: #ffffff;
     pointer-events: none;
@@ -396,7 +396,7 @@
     list-style: none;
     word-break: break-word;
 
-    @include media('>phone') {
+    @include media('>tablet') {
       line-height: 15rem;
       font-size: 15rem;
     }
