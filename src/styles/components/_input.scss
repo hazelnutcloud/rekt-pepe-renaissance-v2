@@ -4,7 +4,7 @@ input {
   overflow: hidden;
   background-color: transparent;
   caret-color: var(--color--yellow);
-  color: var(--text-color--primary);
+  color: var(--color--whitegray) !important;
   font-family: var(--font-family--tertiary);
   font-size: var(--font-size--0);
   width: 100%;
