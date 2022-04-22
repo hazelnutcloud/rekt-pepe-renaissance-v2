@@ -1,0 +1,29 @@
+//
+//  UI atomic elements
+//  ---------------------------------------------
+.ui-element,
+.ui-section {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	box-shadow: 0 0 0.5 rem 0 var(--color--darkblack);
+	background-color: var(--color--lightblack-transparent);
+	backdrop-filter: blur(3rem);
+	-webkit-backdrop-filter: blur(3rem);
+	border-radius: 1.2rem;
+	position: relative;
+	padding: 1rem;
+
+	@media (min-width: 30rem) {
+		padding: 1.5rem;
+	}
+}
+
+.ui-section {
+	max-width: 40rem;
+	width: 100%;
+
+	&.full-width {
+		max-width: 100%;
+	}
+}

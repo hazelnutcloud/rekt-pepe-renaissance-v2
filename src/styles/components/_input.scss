@@ -1,0 +1,45 @@
+.input,
+input {
+  flex-grow: 1;
+  overflow: hidden;
+  background-color: transparent;
+  caret-color: var(--color--yellow);
+  color: var(--text-color--primary);
+  font-family: var(--font-family--tertiary);
+  font-size: var(--font-size--0);
+  width: 100%;
+  display: flex;
+  border: 1px solid var(--border-color--primary);
+  border-radius: var(--border-radius);
+  padding: 0.5rem 1rem;
+  text-align: right;
+  outline: none;
+  appearance: none;
+
+  &-label {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+
+    &-text {
+      font-family: var(--font-family--tertiary);
+      font-size: var(--font-size---1);
+    }
+  }
+
+  &.numeric {
+    font-feature-settings: 'tnum';
+    letter-spacing: -0.5px;
+  }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  border: 1px solid var(--border-color--primary);
+  -webkit-text-fill-color: var(--text-color--primary);
+  -webkit-box-shadow: 0 0 0px 1000px var(--color--lightblack) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}

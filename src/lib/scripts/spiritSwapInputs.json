@@ -1,0 +1,14 @@
+{
+    "name":"Spirit Swap NFT Drop",
+    "description":"Define how many Spirit NFTs to purchase",
+    "author":"Michał Wasilewski",
+    "inputs":[
+        {
+            "label":"Quantity:",
+            "primitive":"token",
+            "encode":"address",
+            "index":0,
+            "tooltip":""
+        }
+    ]
+}

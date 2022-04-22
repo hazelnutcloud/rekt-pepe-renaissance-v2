@@ -1,0 +1,17 @@
+.bottom-drawer {
+    display: grid;
+    gap: 2rem;
+
+    .grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .center {
+        place-items: center;
+    }
+
+    .gap-3 {
+        gap: 3rem;
+    }
+}

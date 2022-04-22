@@ -1,0 +1,29 @@
+{
+    "name":"Revest SpiritSwap Collab",
+    "description":"Handles NFT Garage SpiritSwap locks and farming for the Revest Protocol",
+    "front_display": [
+        {
+            "label":"image_overlay",
+            "encode":"string",
+            "primitive":"metadataURI_image",
+            "index":0
+        }
+    ],
+    "info_modal": [
+        {
+            "label":"Token IDs Locked",
+            "units": "",
+            "encode":"uint256[]",
+            "primitive":"integer_array",
+            "index":2
+        },
+        {
+            "label":"ERC-721 Address",
+            "units": "",
+            "encode":"address",
+            "primitive":"string",
+            "index":1
+        }
+    ],
+    "updates":[]
+}
