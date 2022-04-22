@@ -360,7 +360,7 @@
         justify-content: center;
         flex-direction: column;
         width: 100%;
-          gap: 1rem;
+          gap: 2rem;
 
         :global(.mdc-floating-label) {
           font-family: var(--font-family--tertiary);
