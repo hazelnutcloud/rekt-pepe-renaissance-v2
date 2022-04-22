@@ -83,14 +83,13 @@
 <!--    {/each}-->
 <!--</ul>-->
 
+<ul class="typography-canvas">
+    <li class="background-text">REKT PEPE</li>
+    <li class="background-text">RENAISSANCE</li>
+</ul>
+
 <Countdown from="2022-05-22 16:09:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Athens" let:remaining>
     <div class="panel-counter">
-        <ul class="typography-canvas">
-            {#each Array(3) as _, i}
-                <li class="background-text">REKT PEPE</li>
-                <li class="background-text">RENAISSANCE</li>
-            {/each}
-        </ul>
         {#if remaining.done === false}
             {#if remaining.days || remaining.hours || remaining.minutes || remaining.seconds}
                 <div class="panel-counter-date">
@@ -109,7 +108,7 @@
 
 <section class="panel-wrapper">
     <div class="panel-body ui-element">
-        <h2 class="panel-body-title highlight">Rekt Pepe Renaissance</h2>
+        <h2 class="panel-body-title highlight">NFT DROP</h2>
         <span class="panel-body-text">
             RektPepeRenaissance is this and that because this and that.
             If you'd like to participate in the ealy bird something, get on the list below.
@@ -157,6 +156,11 @@
         {/if}
     </div>
 </section>
+
+<ul class="typography-canvas">
+    <li class="background-text">REKT PEPE</li>
+    <li class="background-text">RENAISSANCE</li>
+</ul>
 
 {#if $appVersionIndex === 2}
 
@@ -335,7 +339,6 @@
       gap: 2rem;
       max-width: 40rem;
       width: 100%;
-      margin-top: 2rem;
     }
 
     &-body {
@@ -520,7 +523,7 @@
 
 
     * :global(.button) {
-        padding: 0.5rem 1rem;
+        padding: 1rem;
         flex: 1;
     }
 

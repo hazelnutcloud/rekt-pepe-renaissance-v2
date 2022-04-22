@@ -78,10 +78,14 @@
 		flex-direction: column;
 		padding: var(--page-wrapper-padding);
 		width: 100%;
-		//max-width: var(--screen--xl);
+		gap: 3rem;
 		margin: 0 auto;
 		align-items: center;
 		justify-content: space-evenly;
+
+		@include media('>phone') {
+			gap: 5rem;
+		}
 	}
 
 	.socials {

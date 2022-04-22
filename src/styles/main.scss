@@ -4,7 +4,7 @@
 @use './components';
 
 ::selection {
-	background-color: var(--color--yellow);
+	background-color: var(--color--blueish);
 	color: var(--text-color--secondary);
 }
 
@@ -104,10 +104,9 @@ pre {
 	color: var(--text-color);
 }
 
-input,
 button {
-	font-size: inherit;
-	font-family: inherit;
+	font-family: var(--font-family--tertiary) !important;
+	font-size: 1rem !important;
 }
 
 .inner-border-radius {

@@ -24,6 +24,7 @@
 	--color--whitegray-transparent: hsla(0, 0%, 94%, 0.5);
 	--color--white: hsl(0, 0%, 100%);
 	--color--yellow: hsl(39, 100%, 50%);
+	--color--blueish: #b6ddd8;
 
 	//
 	//  Color - Validation
@@ -85,7 +86,7 @@
 
 	// Colors
 	--mdc-theme-secondary: var(--border-color--primary);
-	--mdc-theme-primary: #b6ddd8;
+	--mdc-theme-primary: var(--color--blueish);
 	--mdc-theme-error: var(--color--error);
 
 	// Borders
@@ -95,6 +96,7 @@
 	// Buttons
 	--mdc-typography-button-font-weight: var(--font-weight--bold);
 	--mdc-typography-button-font-size: var(--font-size---1);
+	--mdc-filled-button-disabled-label-text-color: var(--color--whitegray-transparent);
 	--mdc-outlined-button-container-height: auto;
 	--mdc-filled-button-container-height: auto;
 	--mdc-text-button-with-icon-icon-size: 2rem;
