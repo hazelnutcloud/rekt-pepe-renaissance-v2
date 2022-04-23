@@ -441,10 +441,7 @@
     animation: ease 200s alternate infinite;
     pointer-events: none;
     user-select: none;
-
-      &-wrapper {
-        list-style: none;
-      }
+      list-style: none;
 
     &::before,
     &::after {
