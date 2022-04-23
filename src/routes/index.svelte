@@ -567,7 +567,7 @@
         height: var(--font-size--5);
         transform: scale(0.8);
         margin-inline: auto;
-        animation: animateHeart 1s 8;
+        //animation: animateHeart 1s 8;
 
       :global(svg) {
         height: 6rem;
