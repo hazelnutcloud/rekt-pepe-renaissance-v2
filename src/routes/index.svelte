@@ -199,7 +199,7 @@
             on:click={() => shouldShowActions.set(true)}
             variant="unelevated"
             class="button"
-            disabled={!amountOfNftsToPurchase > 0}>
+            disabled={amountOfNftsToPurchase <= 0}>
             <Label
                 >{canPurchase
                     ? hasTransactionFinished
