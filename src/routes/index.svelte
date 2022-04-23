@@ -530,8 +530,8 @@
         font-size: 1.2rem !important;
 
         &:not(:disabled) {
-            background: rgb(219,0,0);
-            background: linear-gradient(90deg, rgba(219,0,0,1) 0%, rgba(86,195,117,1) 100%);
+            background: #e75959;
+            background: linear-gradient(90deg, #e75959 0%, #56c375 100%);
         }
     }
 
