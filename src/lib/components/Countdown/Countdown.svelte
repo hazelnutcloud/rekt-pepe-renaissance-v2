@@ -5,6 +5,7 @@
     import utc from 'dayjs/plugin/utc.js'
     import tz from 'dayjs/plugin/timezone.js'
     import customParseFormat from 'dayjs/plugin/customParseFormat.js'
+    import {appVersionIndex} from '../../../stores.js'
 
     dayjs.extend(duration)
     dayjs.extend(utc)
@@ -60,6 +61,7 @@
                     seconds: r.seconds(),
                     done: false
                 }
+                appVersionIndex.set(1);
                 diff-=1000
             } else {
                 remaining = {
@@ -72,6 +74,7 @@
                     seconds: 0,
                     done: true
                 }
+                appVersionIndex.set(2);
                 clearInterval(timer)
             }
 

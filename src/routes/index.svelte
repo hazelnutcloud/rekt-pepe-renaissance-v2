@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+    import { fade } from 'svelte/transition';
     import Countdown from '$lib/components/Countdown/Countdown.svelte';
     import Confetti from '$lib/components/Confetti/Confetti.svelte';
     import Integer from '$lib/components/Integer/Integer.svelte';
@@ -65,120 +66,91 @@
     <title>Home</title>
 </svelte:head>
 
-<!--<section class="title-group">-->
-<!--	<h1 class="title">-->
-<!--		REKT-->
-<!--	</h1>-->
-<!--</section>-->
-
-<ul>
-{#each Array(15) as _, i}
-    <li class="firefly"/>
-{/each}
-</ul>
-
-<!--<ul class="typography-canvas">-->
-<!--    {#each Array(1) as _, i}-->
-<!--        <li class="background-text">REKT PEPE</li>-->
-<!--    {/each}-->
-<!--</ul>-->
-
-<ul class="typography-canvas">
-    <li class="background-text">REKT PEPE</li>
-    <li class="background-text">RENAISSANCE</li>
-</ul>
-
-<Countdown from="2022-05-22 16:09:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Athens" let:remaining>
-    <div class="panel-counter">
-        {#if remaining.done === false}
-            {#if remaining.days || remaining.hours || remaining.minutes || remaining.seconds}
-                <div class="panel-counter-date">
-            <span>{remaining.days}<span class="highlight">d&nbsp;</span></span>
-            <span>{remaining.hours}<span class="highlight">h&nbsp;</span></span>
-            <span>{remaining.minutes}<span class="highlight">m&nbsp;</span></span>
-            <span>{remaining.seconds}<span class="highlight">s&nbsp;</span></span>
-                </div>
-                <div><span class="highlight">until</span> Early Bird</div>
-            {/if}
-        {:else}
-            {appVersionIndex.set(2)}
-        {/if}
-    </div>
-</Countdown>
-
-<section class="panel-wrapper">
-    <div class="panel-body ui-element">
-        <h2 class="panel-body-title highlight">NFT DROP</h2>
-        <span class="panel-body-text">
+<Countdown from="2022-05-23 9:00:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Madrid" let:remaining>
+    {#if $appVersionIndex === 1}
+            {#if remaining.done === false}
+                {#if remaining.days || remaining.hours || remaining.minutes || remaining.seconds}
+                    <div class="splash-page-wrapper" transition:fade>
+                    <ul class="typography-canvas">
+                        <li class="background-text">REKT PEPE</li>
+                        <li class="background-text">RENAISSANCE</li>
+                    </ul>
+        <div class="panel-counter">
+                    <div class="panel-counter-date">
+                        <span class="highlight">{remaining.days}</span><span>d&nbsp;</span>
+                        <span class="highlight">{remaining.hours}</span><span>h&nbsp;</span>
+                        <span class="highlight">{remaining.minutes}</span><span>m&nbsp;</span>
+                        <span class="highlight">{remaining.seconds}</span><span>s&nbsp;</span>
+                    </div>
+                    <div>
+                        <span>until</span>
+                        <span class="highlight"> Early Bird</span>
+                    </div>
+        </div>
+                    <section class="panel-wrapper">
+                        <div class="panel-body">
+                            <h2 class="panel-body-title highlight">NFT DROP</h2>
+                            <span class="panel-body-text">
             RektPepeRenaissance is this and that because this and that.
             If you'd like to participate in the ealy bird something, get on the list below.
         </span>
-        {#if !submitted}
-            <form class="panel-body-form" action="">
-                <!--
-                  Note: when you bind to `invalid`, but you only want to
-                  monitor it instead of updating it yourself, you also
-                  should include `updateInvalid`.
-                -->
-                <Textfield
-                        type="email"
-                        bind:dirty
-                        bind:invalid
-                        updateInvalid
-                        bind:value
-                        label="Email Address"
-                        input$autocomplete="email"
-                        on:focus={() => (focused = true)}
-                        on:blur={() => (focused = false)}
-                >
-                </Textfield>
-                {#if invalid}
-                    <div class="message error">That's not a valid email address, come on.</div>
-                {/if}
-                <section class="action-wrapper">
-                    <Button
-                            variant="unelevated"
-                            class="button"
-                            disabled={disabled}
-                            on:click={(event) => handleSubmitEmailForm(event)}
-                    >
-                        <Label
-                        >Get On The List</Label>
-                    </Button>
-                </section>
-            </form>
-        {:else}
+                            {#if !submitted}
+                                <form class="panel-body-form" action="">
+                                    <!--
+                                      Note: when you bind to `invalid`, but you only want to
+                                      monitor it instead of updating it yourself, you also
+                                      should include `updateInvalid`.
+                                    -->
+                                    <Textfield
+                                      type="email"
+                                      bind:dirty
+                                      bind:invalid
+                                      updateInvalid
+                                      bind:value
+                                      label="Email Address"
+                                      input$autocomplete="email"
+                                      on:focus={() => (focused = true)}
+                                      on:blur={() => (focused = false)}
+                                    >
+                                    </Textfield>
+                                    {#if invalid}
+                                        <div class="message error">That's not a valid email address, come on.</div>
+                                    {/if}
+                                    <section class="action-wrapper">
+                                        <Button
+                                          variant="unelevated"
+
+                                          class="button"
+                                          disabled={disabled}
+                                          on:click={(event) => handleSubmitEmailForm(event)}
+                                        >
+                                            <Label
+                                            >Get On The List</Label>
+                                        </Button>
+                                    </section>
+                                </form>
+                            {:else}
             <span class="heart-icon">
                     <div class="message success">Thank you for signing up!</div>
                     <TiHeart />
                     <Confetti />
                 </span>
-        {/if}
-    </div>
-</section>
-
-<ul class="typography-canvas">
-    <li class="background-text">REKT PEPE</li>
-    <li class="background-text">RENAISSANCE</li>
-</ul>
+                            {/if}
+                        </div>
+                    </section>
+                    <ul class="typography-canvas">
+                        <li class="background-text">REKT PEPE</li>
+                        <li class="background-text">RENAISSANCE</li>
+                    </ul>
+                    </div>
+                {/if}
+            {/if}
+    {/if}
+</Countdown>
 
 {#if $appVersionIndex === 2}
 
-<img class="inner-border-radius" src="https://cdn.discordapp.com/attachments/963461875897610351/966459714550509718/IMG_8541.jpg" alt="">
-
-<section class="ui-section full-width nft-teaser-wrapper">
-    <div class="nft-teaser-copy">text</div>
-    <div class="ui-element nft-teaser-container">
-        {#each Array(4) as _, i}
-            <img class="nft-teaser" src="https://ik.imagekit.io/bayc/assets/ape2.png" alt="">
-        {/each}
-    </div>
-</section>
-
-{/if}
-{#if $appVersionIndex === 2}
-
-<section class="ui-section">
+<section class="ui-section" transition:fade>
     <img class="image" src={nftURI} alt="" />
     <img class="image-punch" src={nftURI} alt="" />
     <section class="card-header">
@@ -320,8 +292,23 @@
 </UseActions>
     {/if}
 
+<ul transition:fade>
+    {#each Array(15) as _, i}
+        <li class="firefly"/>
+    {/each}
+</ul>
 
 <style lang="scss">
+    .splash-page-wrapper {
+        display: grid;
+        place-items: center;
+        gap: 3rem;
+
+        @include media('>phone') {
+            gap: 5rem;
+        }
+    }
+
   .error {
     color: var(--color--error);
     font-size: 0.85rem;
@@ -331,7 +318,14 @@
   }
 
   .highlight {
-    color: #a5a5a5;
+      background: -webkit-linear-gradient(#eee, #333);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background: linear-gradient(to right, #FDFBFB, #EBEDEE 70%);
+      /* text-transform: uppercase; */
+      background: linear-gradient(to right, #db0000 0%, #56c375 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
   }
 
   .panel {
@@ -342,10 +336,11 @@
     }
 
     &-body {
-      backdrop-filter: blur(0.5rem);
-      background-color: #ffffff5c;
       border-radius: var(--border-radius);
-      border: 2px solid #ffffff33;
+        border: 4px solid var(--color--lightgray-transparent);
+        padding: 2rem;
+        display: grid;
+        gap: 1rem;
 
       &-title {
         font-family: var(--font-family--tertiary);
@@ -361,6 +356,7 @@
         flex-direction: column;
         width: 100%;
           gap: 2rem;
+          margin-top: 1rem;
 
         :global(.mdc-floating-label) {
           font-family: var(--font-family--tertiary);
@@ -374,8 +370,10 @@
       justify-content: center;
       align-items: center;
       font-family: var(--font-family--tertiary);
-      text-align: center;
-        font-size: var(--font-size--3);
+        color: var(--color--lightgray-transparent);
+
+        text-align: center;
+    font-size: var(--font-size--3);
     }
   }
 
@@ -389,8 +387,7 @@
     font-family: var(--font-family--secondary);
     font-size: 10rem;
     line-height: 5rem;
-    opacity: 0.3;
-    color: #ffffff;
+    color: var(--color--lightgray-transparent);
     pointer-events: none;
     user-select: none;
     list-style: none;

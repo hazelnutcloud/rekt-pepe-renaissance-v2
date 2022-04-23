@@ -1,23 +1,19 @@
 @import '@fontsource/montserrat';
-@import '@fontsource/roboto';
-@import '@fontsource/syne';
 @import '@fontsource/krona-one';
-@import "@fontsource/butcherman";
-@import "@fontsource/metamorphous";
 @import '@fontsource/blackout-sunrise';
 
 @font-face {
-	font-display: swap;
-	font-family: 'eurostile';
-	font-style: normal;
-	font-weight: normal;
-	src: url('/fonts/EurostileNormal.ttf') format('truetype');
+  font-display: swap;
+  font-family: 'eurostile';
+  font-style: normal;
+  font-weight: normal;
+  src: url('/fonts/EurostileNormal.ttf') format('truetype');
 }
 
 @font-face {
-	font-display: swap;
-	font-family: 'eurostile';
-	font-style: normal;
-	font-weight: bold;
-	src: url('/fonts/EurostileBold.ttf') format('truetype');
+  font-display: swap;
+  font-family: 'eurostile';
+  font-style: normal;
+  font-weight: bold;
+  src: url('/fonts/EurostileBold.ttf') format('truetype');
 }
