@@ -454,6 +454,10 @@
     user-select: none;
       list-style: none;
 
+      &-wrapper {
+          margin: 0;
+      }
+
     &::before,
     &::after {
       content: "";
