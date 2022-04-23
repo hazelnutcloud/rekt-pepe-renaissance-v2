@@ -5,7 +5,7 @@
 <script lang="ts">
     import Countdown from '$lib/components/Countdown/Countdown.svelte';
     import Confetti from '$lib/components/Confetti/Confetti.svelte';
-    import Integer from '$lib/components/Integer/integer.svelte';
+    import Integer from '$lib/components/Integer/Integer.svelte';
     import UseActions from '$lib/components/useActions/_UseActionsComponent.svelte';
     import inputObj from '$lib/scripts/spiritSwapInputs.json';
     import Accordion,{ Content,Header,Panel } from '@smui-extra/accordion';
