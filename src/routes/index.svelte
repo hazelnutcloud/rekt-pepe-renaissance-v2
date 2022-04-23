@@ -292,7 +292,7 @@
 </UseActions>
     {/if}
 
-<ul transition:fade>
+<ul class="firefly-wrapper" transition:fade>
     {#each Array(15) as _, i}
         <li class="firefly"/>
     {/each}
@@ -441,7 +441,10 @@
     animation: ease 200s alternate infinite;
     pointer-events: none;
     user-select: none;
-      list-style: none;
+
+      &-wrapper {
+        list-style: none;
+      }
 
     &::before,
     &::after {
