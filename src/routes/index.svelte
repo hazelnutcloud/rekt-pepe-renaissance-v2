@@ -10,6 +10,7 @@
     import inputObj from '$lib/scripts/spiritSwapInputs.json';
     import Accordion,{ Content,Header,Panel } from '@smui-extra/accordion';
     import Textfield from '@smui/textfield';
+    import { portal } from '$lib/functions/portal.js';
     import Button,{ Label } from '@smui/button';
     import IconButton,{ Icon } from '@smui/icon-button';
     import pluralize from 'pluralize';
@@ -88,7 +89,7 @@
         </div>
                     <section class="panel-wrapper">
                         <div class="panel-body">
-                            <h2 class="panel-body-title highlight">Exclusive NFT Drop</h2>
+                            <h2 class="panel-body-title highlight">NFT Drop</h2>
                             <span class="panel-body-text">
             RektPepeRenaissance is this and that because this and that.
             If you'd like to participate in the ealy bird something, get on the list below.
@@ -135,10 +136,6 @@
                             {/if}
                         </div>
                     </section>
-                    <ul class="typography-canvas">
-                        <li class="background-text">Rekt Pepe</li>
-                        <li class="background-text">Renaissance</li>
-                    </ul>
                     </div>
                 {/if}
             {/if}
@@ -289,7 +286,7 @@
 </UseActions>
     {/if}
 
-<ul class="firefly-wrapper" transition:fade>
+<ul class="firefly-wrapper" transition:fade use:portal={'#portal'} >
     {#each Array(15) as _, i}
         <li class="firefly"/>
     {/each}
@@ -352,11 +349,20 @@
     &-body {
         color: var(--color--whitegray-transparent);
       border-radius: var(--border-radius);
-        padding: 2rem;
         display: grid;
-        gap: 1rem;
-        text-align: center;
+        padding: 1rem;
+        gap: 2rem;
         background-color: hsl(0deg 0% 29% / 9%);
+
+        @include media('>tablet') {
+            padding: 2rem;
+        }
+
+        &-title {
+            font-size: var(--font-size--4);
+            text-align: center;
+            text-transform: uppercase;
+        }
 
       &-form {
         display: flex;
@@ -364,7 +370,6 @@
         flex-direction: column;
         width: 100%;
           gap: 2rem;
-          margin-top: 1rem;
 
         :global(.mdc-floating-label) {
           font-family: var(--font-family--base);
@@ -392,20 +397,19 @@
 
   .background-text {
     font-family: var(--font-family--secondary);
-    font-size: 10rem;
-    line-height: 5rem;
+    font-size: var(--font-size--5);
+    line-height: var(--font-size--5);
     color: var(--color--lightgray-transparent);
     pointer-events: none;
     user-select: none;
     list-style: none;
     word-break: break-word;
 
-    @include media('>tablet') {
+    @include media('>desktop') {
       line-height: 10rem;
       font-size: 10rem;
     }
   }
-
 
   .nft-teaser {
     aspect-ratio: 1;
@@ -452,7 +456,7 @@
 
     &::before,
     &::after {
-      content: "?";
+      content: "";
       position: absolute;
       width: 0.5rem;
       height: 0.5rem;
