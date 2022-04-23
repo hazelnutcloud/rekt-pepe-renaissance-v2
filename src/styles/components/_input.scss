@@ -5,7 +5,7 @@ input {
   background-color: transparent;
   caret-color: var(--color--yellow);
   color: var(--color--whitegray) !important;
-  font-family: var(--font-family--tertiary);
+  font-family: var(--font-family--base);
   font-size: var(--font-size--0);
   width: 100%;
   display: flex;
@@ -23,7 +23,7 @@ input {
     gap: 1rem;
 
     &-text {
-      font-family: var(--font-family--tertiary);
+      font-family: var(--font-family--base);
       font-size: var(--font-size---1);
     }
   }

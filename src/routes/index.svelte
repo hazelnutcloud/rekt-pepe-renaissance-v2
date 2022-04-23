@@ -5,13 +5,11 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
     import Countdown from '$lib/components/Countdown/Countdown.svelte';
-    import Confetti from '$lib/components/Confetti/Confetti.svelte';
     import Integer from '$lib/components/Integer/Integer.svelte';
     import UseActions from '$lib/components/useActions/_UseActionsComponent.svelte';
     import inputObj from '$lib/scripts/spiritSwapInputs.json';
     import Accordion,{ Content,Header,Panel } from '@smui-extra/accordion';
     import Textfield from '@smui/textfield';
-    import HelperText from '@smui/textfield/helper-text';
     import Button,{ Label } from '@smui/button';
     import IconButton,{ Icon } from '@smui/icon-button';
     import pluralize from 'pluralize';
@@ -57,6 +55,7 @@
     const handleSubmitEmailForm = (event) => {
         event.preventDefault();
         submitted = true;
+        document.body.classList.add('submitted');
 
         console.log('submitted and valid');
     }
@@ -72,15 +71,15 @@
                 {#if remaining.days || remaining.hours || remaining.minutes || remaining.seconds}
                     <div class="splash-page-wrapper" transition:fade>
                     <ul class="typography-canvas">
-                        <li class="background-text">REKT PEPE</li>
-                        <li class="background-text">RENAISSANCE</li>
+                        <li class="background-text">Rekt Pepe</li>
+                        <li class="background-text">Renaissance</li>
                     </ul>
         <div class="panel-counter">
-                    <div class="panel-counter-date">
-                        <span class="highlight">{remaining.days}</span><span>d&nbsp;</span>
-                        <span class="highlight">{remaining.hours}</span><span>h&nbsp;</span>
-                        <span class="highlight">{remaining.minutes}</span><span>m&nbsp;</span>
-                        <span class="highlight">{remaining.seconds}</span><span>s&nbsp;</span>
+                    <div class="panel-counter-date highlight">
+                        <span>{remaining.days}</span><span>d&nbsp;</span>
+                        <span>{remaining.hours}</span><span>h&nbsp;</span>
+                        <span>{remaining.minutes}</span><span>m&nbsp;</span>
+                        <span>{remaining.seconds}</span><span>s&nbsp;</span>
                     </div>
                     <div>
                         <span>until</span>
@@ -89,7 +88,7 @@
         </div>
                     <section class="panel-wrapper">
                         <div class="panel-body">
-                            <h2 class="panel-body-title highlight">NFT DROP</h2>
+                            <h2 class="panel-body-title highlight">Exclusive NFT Drop</h2>
                             <span class="panel-body-text">
             RektPepeRenaissance is this and that because this and that.
             If you'd like to participate in the ealy bird something, get on the list below.
@@ -131,16 +130,14 @@
                                 </form>
                             {:else}
             <span class="heart-icon">
-                    <div class="message success">Thank you for signing up!</div>
-                    <TiHeart />
-                    <Confetti />
+                    <div class="highlight">Thank you for signing up!</div>
                 </span>
                             {/if}
                         </div>
                     </section>
                     <ul class="typography-canvas">
-                        <li class="background-text">REKT PEPE</li>
-                        <li class="background-text">RENAISSANCE</li>
+                        <li class="background-text">Rekt Pepe</li>
+                        <li class="background-text">Renaissance</li>
                     </ul>
                     </div>
                 {/if}
@@ -316,16 +313,33 @@
 
   .success {
   }
+    @keyframes shine {
+        to {
+            background-position: 100% center;
+        }
+    }
 
   .highlight {
+      font-family: var(--font-family--secondary);
       background: -webkit-linear-gradient(#eee, #333);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background: linear-gradient(to right, #FDFBFB, #EBEDEE 70%);
-      /* text-transform: uppercase; */
-      background: linear-gradient(to right, #db0000 0%, #56c375 100%);
+      background: linear-gradient(to right, #e75959 20%, #56c375 40%, #56c375 60%, #e75959 80%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+
+
+
+
+      :global(body.submitted) & {
+          background: linear-gradient(to right, #e75959 20%, #56c375 40%, #56c375 60%, #6984f8 80%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: shine 4s linear forwards;
+      }
   }
 
   .panel {
@@ -336,19 +350,13 @@
     }
 
     &-body {
+        color: var(--color--whitegray-transparent);
       border-radius: var(--border-radius);
-        border: 4px solid var(--color--lightgray-transparent);
         padding: 2rem;
         display: grid;
         gap: 1rem;
-
-      &-title {
-        font-family: var(--font-family--tertiary);
-      }
-
-      &-text {
-        font-size: var(--font-size---1);
-      }
+        text-align: center;
+        background-color: hsl(0deg 0% 29% / 9%);
 
       &-form {
         display: flex;
@@ -359,7 +367,7 @@
           margin-top: 1rem;
 
         :global(.mdc-floating-label) {
-          font-family: var(--font-family--tertiary);
+          font-family: var(--font-family--base);
         }
       }
     }
@@ -369,7 +377,6 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      font-family: var(--font-family--tertiary);
         color: var(--color--lightgray-transparent);
 
         text-align: center;
@@ -394,8 +401,8 @@
     word-break: break-word;
 
     @include media('>tablet') {
-      line-height: 15rem;
-      font-size: 15rem;
+      line-height: 10rem;
+      font-size: 10rem;
     }
   }
 
@@ -447,8 +454,8 @@
     &::after {
       content: "?";
       position: absolute;
-      width: 1rem;
-      height: 1rem;
+      width: 0.5rem;
+      height: 0.5rem;
       border-radius: 50%;
       transform-origin: -10vw;
     }
@@ -516,13 +523,16 @@
     }
   }
 
-
-
-
-
     * :global(.button) {
-        padding: 1rem;
+        padding: 0.5rem 1rem;
         flex: 1;
+
+        font-size: 1.2rem !important;
+
+        &:not(:disabled) {
+            background: rgb(219,0,0);
+            background: linear-gradient(90deg, rgba(219,0,0,1) 0%, rgba(86,195,117,1) 100%);
+        }
     }
 
     @keyframes animateHeart {
@@ -565,10 +575,10 @@
         max-width: 6rem;
       }
 
-      .message {
+      .highlight {
         position: absolute;
         mix-blend-mode: exclusion;
-        font-size: 1.2rem;
+        font-size: var(--font-size--2);
       }
     }
 
@@ -656,8 +666,7 @@
 
     .subtitle {
         color: var(--text-color--accent);
-        font-family: var(--font-family--tertiary);
-        font-size: var(--font-size---1);
+        font-size: var(--font-size--0);
         font-weight: 200;
         text-align: left;
     }
@@ -665,8 +674,7 @@
 	.accordion {
 		&-content-title,
 		&-header-title {
-			font-family: var(--font-family--tertiary);
-            font-size: var(--font-size---2);
+        font-size: var(--font-size---2);
 		}
 	}
 
