@@ -39,7 +39,7 @@ body {
 
   &.submitted {
     transition: background 4s ease-in-out;
-    background-color: #0f0f10;
+    background-color: hsl(240deg 2% 12% / 25%);
   }
 }
 

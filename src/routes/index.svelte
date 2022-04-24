@@ -63,7 +63,7 @@
 </script>
 
 <svelte:head>
-    <title>Home</title>
+    <title>Rekt Pepe Renaissance NFT Drop</title>
 </svelte:head>
 
 <Countdown from="2022-05-23 9:00:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Madrid" let:remaining>
@@ -77,19 +77,15 @@
                     </ul>
         <div class="panel-counter">
                     <div class="panel-counter-date highlight">
-                        <span>{remaining.days}</span><span>d&nbsp;</span>
-                        <span>{remaining.hours}</span><span>h&nbsp;</span>
-                        <span>{remaining.minutes}</span><span>m&nbsp;</span>
-                        <span>{remaining.seconds}</span><span>s&nbsp;</span>
-                    </div>
-                    <div>
-                        <span>until</span>
-                        <span class="highlight"> Early Bird</span>
+                        <span>{remaining.days}</span><span>d</span>
+                        <span>{remaining.hours}</span><span>h</span>
+                        <span>{remaining.minutes}</span><span>m</span>
+                        <span>{remaining.seconds}</span><span>s</span>
                     </div>
         </div>
                     <section class="panel-wrapper">
                         <div class="panel-body">
-                            <h2 class="panel-body-title highlight">NFT Drop</h2>
+                            <h2 class="panel-body-title">Sign Up To Learn More!</h2>
                             <span class="panel-body-text">
             RektPepeRenaissance is this and that because this and that.
             If you'd like to participate in the ealy bird something, get on the list below.
@@ -130,9 +126,7 @@
                                     </section>
                                 </form>
                             {:else}
-            <span class="heart-icon">
-                    <div class="highlight">Thank you for signing up!</div>
-                </span>
+                        <div class="highlight submit-success">Thank you for signing up!</div>
                             {/if}
                         </div>
                     </section>
@@ -308,7 +302,10 @@
     font-size: 0.85rem;
   }
 
-  .success {
+  .submit-success {
+    font-size: var(--font-size--0);
+      text-align: center;
+      margin-top: 1rem;
   }
     @keyframes shine {
         to {
@@ -317,12 +314,12 @@
     }
 
   .highlight {
-      font-family: var(--font-family--secondary);
+      //font-family: var(--font-family--secondary);
       background: -webkit-linear-gradient(#eee, #333);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background: linear-gradient(to right, #FDFBFB, #EBEDEE 70%);
-      background: linear-gradient(to right, #e75959 20%, #56c375 40%, #56c375 60%, #e75959 80%);
+      background: linear-gradient(to right, #e75959 20%, #ffffff 40%, #ffffff 60%, #e75959 80%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-size: 200% auto;
@@ -331,7 +328,7 @@
 
 
       :global(body.submitted) & {
-          background: linear-gradient(to right, #e75959 20%, #56c375 40%, #56c375 60%, #6984f8 80%);
+          background: linear-gradient(to right, #e75959 20%, #ffffff 40%, #ffffff 60%, #6984f8 80%);
           background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -351,17 +348,11 @@
       border-radius: var(--border-radius);
         display: grid;
         padding: 1rem;
-        gap: 2rem;
+        gap: 1rem;
         background-color: hsl(0deg 0% 29% / 9%);
 
         @include media('>tablet') {
             padding: 2rem;
-        }
-
-        &-title {
-            font-size: var(--font-size--4);
-            text-align: center;
-            text-transform: uppercase;
         }
 
       &-form {
@@ -370,6 +361,7 @@
         flex-direction: column;
         width: 100%;
           gap: 2rem;
+          margin-top: 1rem;
 
         :global(.mdc-floating-label) {
           font-family: var(--font-family--base);
@@ -539,7 +531,7 @@
 
         &:not(:disabled) {
             background: #e75959;
-            background: linear-gradient(90deg, #e75959 0%, #56c375 100%);
+            background: linear-gradient(90deg, #e75959 0%, #ffffff 100%);
         }
     }
 
@@ -581,12 +573,6 @@
         height: 6rem;
         max-height: 6rem;
         max-width: 6rem;
-      }
-
-      .highlight {
-        position: absolute;
-        mix-blend-mode: exclusion;
-        font-size: var(--font-size--2);
       }
     }
 
