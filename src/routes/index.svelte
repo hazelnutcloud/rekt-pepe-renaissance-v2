@@ -280,21 +280,17 @@
 </UseActions>
     {/if}
 
-<ul class="firefly-wrapper" transition:fade use:portal={'#portal'} >
-    {#each Array(15) as _, i}
-        <li class="firefly"/>
-    {/each}
-</ul>
+<!--<ul class="firefly-wrapper" transition:fade use:portal={'#portal'} >-->
+<!--    {#each Array(15) as _, i}-->
+<!--        <li class="firefly"/>-->
+<!--    {/each}-->
+<!--</ul>-->
 
 <style lang="scss">
     .splash-page-wrapper {
         display: grid;
         place-items: center;
         gap: 3rem;
-
-        @include media('>phone') {
-            gap: 5rem;
-        }
     }
 
   .error {
@@ -398,8 +394,8 @@
     word-break: break-word;
 
     @include media('>desktop') {
-      line-height: 10rem;
-      font-size: 10rem;
+      line-height: 7rem;
+      font-size: 9rem;
     }
   }
 
