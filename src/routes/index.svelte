@@ -66,7 +66,7 @@
     <title>Rekt Pepe Renaissance NFT Drop</title>
 </svelte:head>
 
-<Countdown from="2022-05-23 9:00:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Madrid" let:remaining>
+<Countdown from="2022-06-26 9:00:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Madrid" let:remaining>
     {#if $appVersionIndex === 1}
             {#if remaining.done === false}
                 {#if remaining.days || remaining.hours || remaining.minutes || remaining.seconds}
