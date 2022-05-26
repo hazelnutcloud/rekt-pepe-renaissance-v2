@@ -12,6 +12,7 @@ describe.only("RPR Tests", async () => {
     let RPR: RektPepeRenaissance
     let RPR_Factory: RektPepeRenaissance__factory
     let owner: SignerWithAddress;
+    //let actorA: SignerWithAddress;
     before(async () => {
         const signers = await ethers.getSigners();
         owner = signers[0];
@@ -24,5 +25,12 @@ describe.only("RPR Tests", async () => {
     }   
     it("deploy contract", async () => {
         await deploy();
+    })
+    it("Mint one NFT", async () => {
+        console.log(`owner of: ${await RPR.balanceOf(owner.address)}`);
+        const tx = await RPR.mint(owner.address);
+        tx.wait();
+        console.log(`owner of: ${await RPR.balanceOf(owner.address)}`);
+        console.log(`address of: ${await RPR.ownerOf(0)}`);
     })
 })

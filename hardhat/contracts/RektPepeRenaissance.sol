@@ -7,4 +7,7 @@ contract RektPepeRenaissance is ERC721A {
     constructor() ERC721A("RektPepeRenaissance", "RPR") {
 
     }
+    function mint(address to) public {
+        _mint(to, 1);
+    }
 }
