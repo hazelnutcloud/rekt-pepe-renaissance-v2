@@ -13,17 +13,18 @@ describe.only("RPR Tests", async () => {
     let RPR_Factory: RektPepeRenaissance__factory
     let owner: SignerWithAddress;
     let actorA: SignerWithAddress;
+    let actorB: SignerWithAddress;
+    let actorC: SignerWithAddress;
     //let actorA: SignerWithAddress;
     before(async () => {
-        const signers = await ethers.getSigners();
-        owner = signers[0];
+        [owner, actorA, actorB, actorC] = await ethers.getSigners();
         RPR_Factory = await ethers.getContractFactory("RektPepeRenaissance") as RektPepeRenaissance__factory
-
-        await network.provider.request({
-            method: "hardhat_impersonateAccount",
-            params: ["0xbcf5ab858cb0c003adb5226bdbfecd0bfd7b6d9f"]
-          });
-        actorA = await ethers.getSigner("0xbcf5ab858cb0c003adb5226bdbfecd0bfd7b6d9f")
+        await deploy();
+        // await network.provider.request({
+        //     method: "hardhat_impersonateAccount",
+        //     params: ["0xbcf5ab858cb0c003adb5226bdbfecd0bfd7b6d9f"]
+        //   });
+        // actorA = await ethers.getSigner("0xbcf5ab858cb0c003adb5226bdbfecd0bfd7b6d9f")
     })
     const deploy = async () => {
         RPR = await RPR_Factory.deploy()
@@ -51,7 +52,7 @@ describe.only("RPR Tests", async () => {
             console.log(`\tOwner of id 1: ${await RPR.ownerOf(0)}`);
 
             expect( 
-                await RPR.ownerOf(1) == actorA.address
+                await RPR.ownerOf(0) == actorA.address
             )
         })
         it("Batch mint 2 NFTs", async () => {
@@ -75,17 +76,77 @@ describe.only("RPR Tests", async () => {
             
         })
         it("Transfer via allowance", async () => {
-            
+            // RPR.approve() tx.wait()
         })
         it("Batch transfer via allowance", async () => {
             
         })
     })
     it("Transfer contract ownership", async () => {
-        // RPR Renounce ownership
+        console.log(`\tContract owner: \t${await RPR.owner()}`);
+        console.log(`\tFuture owner: \t${actorA.address}`);
+        await expect(
+            RPR.connect(actorA).renounceOwnership()
+        ).to.reverted
+
+        await expect(
+            RPR.connect(owner).transferOwnership(actorA.address)
+        )
+        .to.emit(RPR, 'OwnershipTransferred')
+        .withArgs(owner.address, actorA.address)
+
+        console.log(`\tNew owner: \t${await RPR.owner()}`);
+        expect(await RPR.owner()).to.eq(actorA.address)
         
     })
     it("Withdraw deposited funds to address", async () => {
+        await deploy();
+        const donation = 1;
+
+        const pre_bal1 = await ethers.provider.getBalance(actorA.address);
+        console.log(`\tActor A pre balance: ${pre_bal1}`);
+        //Send funds to address
+        const tx0 = await RPR.connect(actorA).payable_mint(actorA.address, 5, {value: ethers.utils.parseEther("5")});
+        tx0.wait();
+        const post_bal1 = await ethers.provider.getBalance(actorA.address);
+        console.log(`\tActor A post balance: ${post_bal1}`);
+
+        const pre_bal2 = await ethers.provider.getBalance(actorB.address);
+        console.log(`\tActor B pre balance: ${pre_bal2}`);
+        //Send funds to address
+        const tx1 = await RPR.connect(actorB).payable_mint(actorB.address, 2, {value: ethers.utils.parseEther("2")});
+        tx1.wait();
+        const post_bal2 = await ethers.provider.getBalance(actorB.address);
+        console.log(`\tActor B post balance: ${post_bal2}`);
+
+        const pre_bal3 = await ethers.provider.getBalance(actorC.address);
+        console.log(`\tActor C pre balance: ${pre_bal3}`);
+        //Send funds to address
+        const tx2 = await RPR.connect(actorC).payable_mint(actorC.address, 2, {value: ethers.utils.parseEther("2")});
+        tx2.wait();
+        const post_bal3 = await ethers.provider.getBalance(actorC.address);
+        console.log(`\tActor C post balance: ${post_bal3}`);
+
+        const totalDeposit = (pre_bal1.sub(post_bal1)).add(pre_bal2.sub(post_bal2)).add(pre_bal3.sub(post_bal3))
+        console.log(`\tTotal Deposit: \t${totalDeposit.toString()}`);
+        const contract_balance = await ethers.provider.getBalance(RPR.address);
+        console.log(`\tBalance of contract: ${contract_balance}`);
+        expect(totalDeposit == contract_balance);
+
+        await expect(
+            RPR.connect(actorA).withdrawCharity()
+        ).to.reverted
+
+        const tx3 = await RPR.connect(owner).withdrawCharity();
+        tx3.wait()
+
+        console.log(`\tOwner balance: ${await ethers.provider.getBalance(owner.address)}`);
+        console.log(`\tContract balance: ${await ethers.provider.getBalance(RPR.address)}`);
+
+        expect(
+            await ethers.provider.getBalance(RPR.address)
+        ).to.eq(0)
+
         
     })
     // What API for this? Seaport?
