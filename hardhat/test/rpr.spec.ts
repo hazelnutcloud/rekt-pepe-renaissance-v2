@@ -15,7 +15,6 @@ describe.only("RPR Tests", async () => {
     let actorA: SignerWithAddress;
     let actorB: SignerWithAddress;
     let actorC: SignerWithAddress;
-    //let actorA: SignerWithAddress;
     before(async () => {
         [owner, actorA, actorB, actorC] = await ethers.getSigners();
         RPR_Factory = await ethers.getContractFactory("RektPepeRenaissance") as RektPepeRenaissance__factory
@@ -56,10 +55,52 @@ describe.only("RPR Tests", async () => {
             )
         })
         it("Batch mint 2 NFTs", async () => {
-            
+            // Pre conditions
+            console.log(`\tAddress: ${actorA.address}`);
+            console.log(`\tPre balance: ${await RPR.balanceOf(actorA.address)}`);
+
+            // Actions
+            await expect(
+               RPR.connect(owner).mint(actorA.address, 2)
+            )
+            .to.emit(RPR, "Mint")
+            .to.emit(RPR, "Transfer")
+          
+            // What you expect it to look like afterwards
+            console.log(`\tPost balance: ${await RPR.balanceOf(actorA.address)}`);
+            for (let i = 0; i < 2; i++) {
+                console.log(`\tOwner of id ${i + 1}: ${await RPR.ownerOf(i)}`);
+            }
+
+            for (let i = 0; i < 2; i++) {
+                expect(
+                    await RPR.ownerOf(i) == actorA.address
+                )
+            }
         })
         it("Batch mint 5 NFTs", async () => {
-            
+            // Pre conditions
+            console.log(`\tAddress: ${actorA.address}`);
+            console.log(`\tPre balance: ${await RPR.balanceOf(actorA.address)}`);
+
+            // Actions
+            await expect(
+               RPR.connect(owner).mint(actorA.address, 5)
+            )
+            .to.emit(RPR, "Mint")
+            .to.emit(RPR, "Transfer")
+          
+            // What you expect it to look like afterwards
+            console.log(`\tPost balance: ${await RPR.balanceOf(actorA.address)}`);
+            for (let i = 0; i < 5; i++) {
+                console.log(`\tOwner of id ${i + 1}: ${await RPR.ownerOf(i)}`);
+            }
+
+            for (let i = 0; i < 5; i++) {
+                expect(
+                    await RPR.ownerOf(i) == actorA.address
+                )
+            }
         })
         it("burn 1 NFT", async () => {
             
