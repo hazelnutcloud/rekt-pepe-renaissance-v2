@@ -102,8 +102,16 @@ describe.only("RPR Tests", async () => {
                 )
             }
         })
-        it("burn 1 NFT", async () => {
-            
+        it("Burn 1 NFT", async () => {
+            // Pre conditions
+            console.log(`Address: ${actorA.address}`);
+            console.log(`Pre-balance: ${RPR.balanceOf(actorA.address)}`);
+            // Actions
+
+            // What you expect it to look like afterwards
+        })
+        it("Batch burn 2 NFTs", async() => {
+
         })
         it("Batch burn 5 NFTs", async () => {
             

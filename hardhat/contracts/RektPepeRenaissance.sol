@@ -10,6 +10,7 @@ contract RektPepeRenaissance is ERC721A, Ownable {
     uint256 MAX_MINT;
 
     event Mint(address indexed to, uint256 indexed quantity);
+    event Burn(uint256 indexed tokenId, bool indexed approvalCheck);
 
     constructor() ERC721A("RektPepeRenaissance", "RPR") Ownable() {
         FLOOR_PRICE = 1 ether;
@@ -24,6 +25,10 @@ contract RektPepeRenaissance is ERC721A, Ownable {
         require(msg.value >= FLOOR_PRICE * quantity, "Insufficient funds for floor price");
         _mint(to, quantity);
         emit Mint(to, quantity);
+    }
+    function burn(uint256 tokenId, bool approvalCheck) public onlyOwner {
+        _burn(tokenId, approvalCheck);
+        emit Burn(tokenId, approvalCheck);
     }
     function withdrawCharity() public payable onlyOwner {
         require(
