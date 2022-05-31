@@ -75,28 +75,23 @@
                         <li class="background-text">Rekt Pepe</li>
                         <li class="background-text">Renaissance</li>
                     </ul>
-        <div class="panel-counter">
-                    <div class="panel-counter-date highlight">
-                        <span>{remaining.days}</span><span>d</span>
-                        <span>{remaining.hours}</span><span>h</span>
-                        <span>{remaining.minutes}</span><span>m</span>
-                        <span>{remaining.seconds}</span><span>s</span>
-                    </div>
-        </div>
                     <section class="panel-wrapper">
                         <div class="panel-body">
-                            <h2 class="panel-body-title">Sign Up To Learn More!</h2>
+                            <h2 class="panel-body-title">Join the Discord</h2>
                             <span class="panel-body-text">
-            RektPepeRenaissance is this and that because this and that.
-            If you'd like to participate in the ealy bird something, get on the list below.
-        </span>
-                            {#if !submitted}
-                                <form class="panel-body-form" action="">
+                                Stay tuned for more from Rekt Pepe Renaissance!
+                            </span>
+                            <a href="https://discord.gg/TdJSzW9H4G"> 
+                                <button class="button">
+                                    Join
+                                </button>
+                            </a>
+                            <!-- {#if !submitted} -->
+                                <!-- <form class="panel-body-form" action="">
                                     <!--
                                       Note: when you bind to `invalid`, but you only want to
                                       monitor it instead of updating it yourself, you also
                                       should include `updateInvalid`.
-                                    -->
                                     <Textfield
                                       type="email"
                                       bind:dirty
@@ -124,10 +119,10 @@
                                             >Get On The List</Label>
                                         </Button>
                                     </section>
-                                </form>
-                            {:else}
-                        <div class="highlight submit-success">Thank you for signing up!</div>
-                            {/if}
+                                </form> -->
+                            <!-- {:else} -->
+                            <!-- <div class="highlight submit-success">Thank you for signing up!</div> -->
+                            <!-- {/if} -->
                         </div>
                     </section>
                     </div>

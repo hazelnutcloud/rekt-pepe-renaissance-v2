@@ -50,7 +50,8 @@ body {
   position: relative;
 
   &::after {
-    background-image: url("https://c.tenor.com/X4TZEAWXNqEAAAAC/kaleidoscope-jewels.gif");
+    //background-image: url("https://c.tenor.com/X4TZEAWXNqEAAAAC/kaleidoscope-jewels.gif");
+    background-color: #21010c;
     //background-image: url("https://i.pinimg.com/originals/7c/f2/5f/7cf25fcdb721cc901303c9774ec3463e.gif");
     content: "";
     display: block;
