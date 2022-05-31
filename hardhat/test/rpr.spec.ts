@@ -104,22 +104,92 @@ describe.only("RPR Tests", async () => {
         })
         it("Burn 1 NFT", async () => {
             // Pre conditions
-            console.log(`Address: ${actorA.address}`);
-            console.log(`Pre-balance: ${RPR.balanceOf(actorA.address)}`);
-            // Actions
+            console.log(`\tActor A Address: ${actorA.address}`);
+            await RPR.connect(owner).mint(actorA.address, 1)
+            console.log(`\tActor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
 
+            // Actions
+            await expect(
+                RPR.connect(actorB).burn(0)
+            )
+            .to.be.reverted
+
+            await expect(
+                RPR.connect(actorA).burn(0)
+            )
+            .to.emit(RPR, "Burn")
+            
             // What you expect it to look like afterwards
+            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
         })
         it("Batch burn 2 NFTs", async() => {
+            // Pre conditions
+            console.log(`\tActor A Address: ${actorA.address}`);
+            await RPR.connect(owner).mint(actorA.address, 2)
+            console.log(`\tActor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
 
+            // Actions
+            for (let i = 0; i < 2; i++) {
+                await expect(
+                    RPR.connect(actorB).burn(i)
+                )
+                .to.be.reverted
+    
+                await expect(
+                    RPR.connect(actorA).burn(i)
+                )
+                .to.emit(RPR, "Burn")
+            }
+            
+            // What you expect it to look like afterwards
+            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
         })
         it("Batch burn 5 NFTs", async () => {
+            // Pre conditions
+            console.log(`\tActor A Address: ${actorA.address}`);
+            await RPR.connect(owner).mint(actorA.address, 5)
+            console.log(`\tActor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
+
+            // Actions
+            for (let i = 0; i < 5; i++) {
+                await expect(
+                    RPR.connect(actorB).burn(i)
+                )
+                .to.be.reverted
+    
+                await expect(
+                    RPR.connect(actorA).burn(i)
+                )
+                .to.emit(RPR, "Burn")
+            }
             
+            // What you expect it to look like afterwards
+            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
         })
     })
     describe("Transfer", async () => {
         it("Transfer single", async () => {
-            
+            // Pre conditions
+            console.log(`\tActor A Address: ${actorA.address}`);
+            await RPR.connect(owner).mint(actorA.address, 1)
+            console.log(`\tActor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
+            console.log(`\tActor B Address: ${actorB.address}`);
+            console.log(`\tActor B Pre balance: ${await RPR.balanceOf(actorB.address)}`);
+
+            // Actions
+            await expect(
+                RPR.connect(actorB).transfer(actorA.address, actorB.address, 0)
+            )
+            .to.be.reverted
+
+            //await expect(
+                //RPR.connect(actorA).transfer(actorA.address, actorB.address, 0)
+            //)
+            //.to.emit(RPR, "Transfer")
+
+            // What you expect it to look like afterwards
+            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
+            console.log(`\tActor B Post balance: ${await RPR.balanceOf(actorB.address)}`);
         })
         it("Transfer multiple NFTs", async () => {
             
