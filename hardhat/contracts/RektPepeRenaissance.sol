@@ -2,8 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "./ERC721A.sol";
+import "./RPRSmartWallet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
 
@@ -13,6 +15,7 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     uint256 public immutable maxPerAddressDuringMint;
     uint256 public immutable seedRoundCap;
     uint256 public immutable seedSaleDuration = 4 hours;
+    address public immutable smartWalletTemplate;
     struct SaleConfig {
         uint32 preSaleStartTime;
         uint64 seedRoundPrice;
@@ -43,6 +46,8 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         amountForDevs = amountForDevs_;
         BASE_URI = baseUri_;
         seedRoundCap = seedRoundCap_;
+        RPRSmartWallet smartWallet = new RPRSmartWallet();
+        smartWalletTemplate = address(smartWallet);
         require(
             amountForAuctionAndDev_ <= collectionSize_,
             "larger collection size needed"
@@ -204,6 +209,11 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     {
         return ownershipOf(tokenId);
     }
+
+    function getWalletForTokenId(uint256 tokenId) private returns (RPRSmartWallet) {
+        return RPRSmartWallet(Clones.cloneDeterministic(smartWalletTemplate, bytes32(tokenId)));
+    }
+
     /* Maintaining this function for charlie's tests. Will be removed soon. */
     function payable_mint(address to, uint256 quantity) public payable{
         // require(quantity <= MAX_MINT, "Max mint of 5");
@@ -211,4 +221,5 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         _safeMint(to, quantity);
         emit Mint(to, quantity);
     }
+    
 }
