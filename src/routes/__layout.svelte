@@ -27,7 +27,7 @@
     <a
       class="icon-wrapper"
       data-delay="500"
-      href="https://discord.gg/TdJSzW9H4G"
+      href="https://discord.gg/rektpeperenaissance"
       target="_blank"
     >
       <Discord />

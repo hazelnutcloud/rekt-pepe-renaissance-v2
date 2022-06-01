@@ -57,7 +57,7 @@
     function handleSubmitEmailForm() {
         submitted = true;
         document.body.classList.add('submitted');
-        window.open("https://discord.gg/TdJSzW9H4G", "_blank");
+        window.open("https://discord.gg/rektpeperenaissance", "_blank");
     }
 </script>
 
