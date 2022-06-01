@@ -74,6 +74,9 @@
                         <li class="background-text">Rekt Pepe</li>
                         <li class="background-text">Renaissance</li>
                     </ul>
+                    <div class="panel-counter">
+                        <div class="panel-counter-date highlight">Coming Soon</div>
+                    </div>
                     <section class="panel-wrapper">
                         <div class="panel-body">
                             <h2 class="panel-body-title">Join the Discord</h2>
