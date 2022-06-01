@@ -6,7 +6,7 @@ import "./RPRSmartWallet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "@openzeppelin/contracts/interfaces/IERC20.sol"
+import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
 contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
 
@@ -243,13 +243,16 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     // and just send ether to it? Is this method even needed? Are any of these methods actually needed? Is it 
     // enough to just provide the address of the smart wallet and let the user do as they will?
     function depositEther(uint256 tokenId) external payable {
-        getWalletForTokenId(tokenId).call({value: msg.value});
+        
+        //You can't pass the call thing to that like you think. If you want to send ether to that address
+        //Then you need to make the wallet and then send it using transfer() or send() instead.
+        getWalletForTokenId(tokenId);//.call({value: msg.value});
     }
 
-    function depositERC20(address contract, uint256 tokenId) external {
+    function depositERC20(address _contract, uint256 tokenId) external {
     }
 
-    function depositERC721(address contract, uint256 tokenId, uint256 walletId) external {
+    function depositERC721(address _contract, uint256 tokenId, uint256 walletId) external {
     }
     
 }
