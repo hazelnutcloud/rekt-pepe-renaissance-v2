@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "svelte-kit dev --host",
-    "build": "svelte-kit build && svelte-kit preview --host",
+    "build": "svelte-kit build",
+    "build-dev": "svelte-kit build && svelte-kit preview --host",
     "package": "svelte-kit package",
     "preview": "svelte-kit preview --host",
     "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",
