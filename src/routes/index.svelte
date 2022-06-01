@@ -16,7 +16,8 @@
     import pluralize from 'pluralize';
     import TiHeart from 'svelte-icons/ti/TiHeart.svelte';
     import { shouldShowActions, appVersionIndex } from '../stores.js';
-
+	import Discord from "$lib/components/Icons/Discord.svelte";
+    import Medium from "../../static/images/icons/medium-cropped.svelte";
     let submitted = false;
     let focused = false;
     let value: string | null = null;
@@ -79,11 +80,11 @@
                         <div class="panel-body">
                             <h2 class="panel-body-title">Join the Discord</h2>
                             <span class="panel-body-text">
-                                Stay tuned for more from Rekt Pepe Renaissance!
+                                Stay tuned for the latest from Rekt Pepe Renaissance!
                             </span>
-                            <a href="https://discord.gg/TdJSzW9H4G"> 
-                                <button class="button">
-                                    Join
+                            <a href="https://discord.gg/TdJSzW9H4G" target="_blank"> 
+                                <button class="button" on:click={() => {submitted = true}}>
+                                    <Discord id="Discord"/>
                                 </button>
                             </a>
                             <!-- {#if !submitted} -->
@@ -123,6 +124,16 @@
                             <!-- {:else} -->
                             <!-- <div class="highlight submit-success">Thank you for signing up!</div> -->
                             <!-- {/if} -->
+                        </div>
+                        <div class="panel-body" id="medium-panel">
+                            <h2>
+                                Learn more
+                            </h2>
+                            <div id="medium-div">
+                                <a href="https://medium.com/p/ca721f12f407/edit" target="_blank">
+                                    <Medium />
+                                </a>
+                            </div>
                         </div>
                     </section>
                     </div>
@@ -318,23 +329,29 @@
 
 
 
-      :global(body.submitted) & {
-          background: linear-gradient(to right, #e75959 20%, #ffffff 40%, #ffffff 60%, #6984f8 80%);
-          background-size: 200% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: shine 4s linear forwards;
-      }
+        :global(body.submitted) & {
+            background: linear-gradient(to right, #e75959 20%, #ffffff 40%, #ffffff 60%, #6984f8 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear forwards;
+        }
+  }
+
+  #Discord {
+      background-color: rgb(255, 255, 255, 1) !important;
+      opacity: 100% !important;
   }
 
   .panel {
     &-wrapper {
       gap: 2rem;
-      max-width: 40rem;
+      max-width: 32rem;
       width: 100%;
     }
 
     &-body {
+        margin-top: 30px;
         color: var(--color--whitegray-transparent);
       border-radius: var(--border-radius);
         display: grid;
@@ -423,7 +440,30 @@
   }
 
   $quantity: 15;
+  #medium-panel {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 30px;
+  }
+  #medium-div {
+      flex: 1;
+      justify-content: right;
+      vertical-align: middle;
+  }
 
+  button:hover {
+      cursor: pointer;
+  }
+
+  a:hover {
+      cursor: pointer;
+      text-decoration: none;
+  }
+
+  svg {
+      height: fit-content;
+  }
   .firefly {
     z-index: 1;
     position: fixed;
@@ -515,14 +555,15 @@
   }
 
     * :global(.button) {
-        padding: 0.5rem 1rem;
+        padding: 0.8rem 1rem;
         flex: 1;
-
+        width: 100%;
         font-size: 1.2rem !important;
+        border-radius: 1rem;
 
         &:not(:disabled) {
-            background: #e75959;
-            background: linear-gradient(90deg, #e75959 0%, #ffffff 100%);
+            background: #6665d2;
+            background: linear-gradient(90deg, #6665d2 0%, #7289da 100%);
         }
     }
 
