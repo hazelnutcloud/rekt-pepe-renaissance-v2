@@ -27,6 +27,7 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     mapping(address => uint256) public allowlist;
 
     event Mint(address indexed to, uint256 indexed quantity);
+    event Burn(uint256 indexed tokenId);
 
     modifier callerIsUser() {
         require(msg.sender == tx.origin, "Caller is another contract");
@@ -48,11 +49,30 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         seedRoundCap = seedRoundCap_;
         RPRSmartWallet smartWallet = new RPRSmartWallet();
         smartWalletTemplate = address(smartWallet);
-        require(
-            amountForAuctionAndDev_ <= collectionSize_,
-            "larger collection size needed"
-        );
     }
+    /*
+        These methods serve as wrappers and will be removed whenever Charlie finishes his tests
+    */
+    function mint(address to, uint256 quanitity) public onlyOwner {
+        _mint(to, quanitity);   
+        emit Mint(to, quanitity);
+    }
+    function payable_mint(address to, uint256 quantity) public payable returns (bool) {
+        require(quantity <= MAX_MINT, "Max mint of 5");
+        require(msg.value >= FLOOR_PRICE * quantity, "Insufficient funds for floor price");
+        _mint(to, quantity);
+        emit Mint(to, quantity);
+    }
+    function burn(uint256 tokenId) public {
+        require(ownerOf(tokenId) == msg.sender);
+        _burn(tokenId);
+        emit Burn(tokenId);
+    }
+    function transfer(address from, address to, uint256 tokenId) public {
+        require(from == msg.sender);
+        safeTransferFrom(from, to, tokenId);
+    }
+
     function seedRoundMint(uint256 quantity) external payable callerIsUser {
         uint256 price = uint256(saleConfig.seedRoundPrice);
         require(price != 0, "Seed round not yet started");
