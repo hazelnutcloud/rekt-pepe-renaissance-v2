@@ -19,26 +19,10 @@
     <a
       class="icon-wrapper"
       data-delay="0"
-      href="https://twitter.com/RevestFinance"
+      href="https://twitter.com/RektRenaissance"
       target="_blank"
     >
       <Twitter />
-    </a>
-    <a
-      class="icon-wrapper"
-      data-delay="150"
-      href="https://t.me/revestfinance"
-      target="_blank"
-    >
-      <Telegram />
-    </a>
-    <a
-      class="icon-wrapper"
-      data-delay="300"
-      href="https://t.me/RevestAnnouncements"
-      target="_blank"
-    >
-      <Annoucements />
     </a>
     <a
       class="icon-wrapper"

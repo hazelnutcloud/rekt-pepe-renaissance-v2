@@ -54,12 +54,10 @@
      * @param {event} event - The observable event.
      * @listens event
      */
-    const handleSubmitEmailForm = (event) => {
-        event.preventDefault();
+    function handleSubmitEmailForm() {
         submitted = true;
         document.body.classList.add('submitted');
-
-        console.log('submitted and valid');
+        window.open("https://discord.gg/TdJSzW9H4G", "_blank");
     }
 </script>
 
@@ -67,7 +65,7 @@
     <title>Rekt Pepe Renaissance NFT Drop</title>
 </svelte:head>
 
-<Countdown from="2022-06-26 9:00:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Madrid" let:remaining>
+<Countdown from="2024-01-01 9:00:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Madrid" let:remaining>
     {#if $appVersionIndex === 1}
             {#if remaining.done === false}
                 {#if remaining.days || remaining.hours || remaining.minutes || remaining.seconds}
@@ -82,55 +80,17 @@
                             <span class="panel-body-text">
                                 Stay tuned for the latest from Rekt Pepe Renaissance!
                             </span>
-                            <a href="https://discord.gg/TdJSzW9H4G" target="_blank"> 
-                                <button class="button" on:click={() => {submitted = true}}>
-                                    <Discord id="Discord"/>
-                                </button>
-                            </a>
-                            <!-- {#if !submitted} -->
-                                <!-- <form class="panel-body-form" action="">
-                                    <!--
-                                      Note: when you bind to `invalid`, but you only want to
-                                      monitor it instead of updating it yourself, you also
-                                      should include `updateInvalid`.
-                                    <Textfield
-                                      type="email"
-                                      bind:dirty
-                                      bind:invalid
-                                      updateInvalid
-                                      bind:value
-                                      label="Email Address"
-                                      input$autocomplete="email"
-                                      on:focus={() => (focused = true)}
-                                      on:blur={() => (focused = false)}
-                                    >
-                                    </Textfield>
-                                    {#if invalid}
-                                        <div class="message error">That's not a valid email address, come on.</div>
-                                    {/if}
-                                    <section class="action-wrapper">
-                                        <Button
-                                          variant="unelevated"
-
-                                          class="button"
-                                          disabled={disabled}
-                                          on:click={(event) => handleSubmitEmailForm(event)}
-                                        >
-                                            <Label
-                                            >Get On The List</Label>
-                                        </Button>
-                                    </section>
-                                </form> -->
-                            <!-- {:else} -->
-                            <!-- <div class="highlight submit-success">Thank you for signing up!</div> -->
-                            <!-- {/if} -->
+                            <button class="button" on:click={() => {handleSubmitEmailForm()}}>
+                                <Discord id="Discord"/>
+                            </button>
+                        
                         </div>
                         <div class="panel-body" id="medium-panel">
                             <h2>
-                                Learn more
+                                Learn more:
                             </h2>
                             <div id="medium-div">
-                                <a href="https://medium.com/p/ca721f12f407/edit" target="_blank">
+                                <a href="https://medium.com/p/ca721f12f407" target="_blank">
                                     <Medium />
                                 </a>
                             </div>
