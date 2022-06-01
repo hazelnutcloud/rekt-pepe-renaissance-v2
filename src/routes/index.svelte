@@ -62,7 +62,7 @@
 </script>
 
 <svelte:head>
-    <title>Rekt Pepe Renaissance NFT Drop</title>
+    <title>Rekt Pepe Renaissance NFT</title>
 </svelte:head>
 
 <Countdown from="2024-01-01 9:00:00" dateFormat="YYYY-MM-DD H:m:s" zone="Europe/Madrid" let:remaining>
