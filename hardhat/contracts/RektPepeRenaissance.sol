@@ -6,6 +6,7 @@ import "./RPRSmartWallet.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
+import "@openzeppelin/contracts/interfaces/IERC20.sol"
 
 contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
 
@@ -54,18 +55,19 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         These methods serve as wrappers and will be removed whenever Charlie finishes his tests
     */
     function mint(address to, uint256 quanitity) public onlyOwner {
-        _mint(to, quanitity);   
+        _safeMint(to, quanitity);   
         emit Mint(to, quanitity);
     }
     function payable_mint(address to, uint256 quantity) public payable returns (bool) {
-        require(quantity <= MAX_MINT, "Max mint of 5");
-        require(msg.value >= FLOOR_PRICE * quantity, "Insufficient funds for floor price");
-        _mint(to, quantity);
+        require(quantity <= maxBatchSize, "Max mint of 5");
+        require(msg.value >= 5 ether * quantity, "Insufficient funds for floor price");
+        _safeMint(to, quantity);
         emit Mint(to, quantity);
     }
     function burn(uint256 tokenId) public {
         require(ownerOf(tokenId) == msg.sender);
-        _burn(tokenId);
+        // This is effectively the same as burning? ERC721 doesn't require a burn() implementation.
+        safeTransferFrom(msg.sender, address(0), tokenId);
         emit Burn(tokenId);
     }
     function transfer(address from, address to, uint256 tokenId) public {
@@ -230,16 +232,24 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         return ownershipOf(tokenId);
     }
 
+    /*
+        Smart Wallet Methods
+    */
+
     function getWalletForTokenId(uint256 tokenId) private returns (RPRSmartWallet) {
-        return RPRSmartWallet(Clones.cloneDeterministic(smartWalletTemplate, bytes32(tokenId)));
+        return RPRSmartWallet(Clones.cloneDeterministic(smartWalletTemplate, keccak256(abi.encode(tokenId))));
+    }
+    // Should only the wallets owner be able to deposit ether into it? Technically anyone can figure out the address
+    // and just send ether to it? Is this method even needed? Are any of these methods actually needed? Is it 
+    // enough to just provide the address of the smart wallet and let the user do as they will?
+    function depositEther(uint256 tokenId) external payable {
+        getWalletForTokenId(tokenId).call({value: msg.value});
     }
 
-    /* Maintaining this function for charlie's tests. Will be removed soon. */
-    function payable_mint(address to, uint256 quantity) public payable{
-        // require(quantity <= MAX_MINT, "Max mint of 5");
-        // require(msg.value >= FLOOR_PRICE * quantity, "Insufficient funds for floor price");
-        _safeMint(to, quantity);
-        emit Mint(to, quantity);
+    function depositERC20(address contract, uint256 tokenId) external {
+    }
+
+    function depositERC721(address contract, uint256 tokenId, uint256 walletId) external {
     }
     
 }

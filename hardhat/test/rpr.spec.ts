@@ -40,7 +40,7 @@ describe("RPR Tests", async () => {
     })
     describe("Deploy", async () => {
         it("Deploying contract", async () => {
-            RPR = await RPR_Factory.deploy(5, 10000, 8500, 500, "firstBaseURI")
+            RPR = await RPR_Factory.deploy(5, 10000, 10000, 8500, 500, "firstBaseURI")
             await RPR.deployed();
             console.log(`\tContract deployed to: ${RPR.address}`);
         })
