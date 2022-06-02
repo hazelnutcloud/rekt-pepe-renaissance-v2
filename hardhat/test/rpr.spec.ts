@@ -3,8 +3,9 @@ import { use } from "chai";
 import { expect, assert, } from "chai";
 import { ethers, network } from "hardhat";
 import { solidity } from "ethereum-waffle";
-import { RektPepeRenaissance, RektPepeRenaissance__factory } from "../typechain"
+import { Mock20, Mock20__factory, RektPepeRenaissance, RektPepeRenaissance__factory } from "../typechain"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { mock20Sol } from "../typechain/contracts/mock";
 
 use(solidity)
 /*
@@ -14,6 +15,7 @@ describe("", async () => {
 
 let RPR: RektPepeRenaissance
 let RPR_Factory: RektPepeRenaissance__factory
+let Mock20: Mock20;
 let owner: SignerWithAddress;
 let actorA: SignerWithAddress;
 let actorB: SignerWithAddress;
@@ -335,7 +337,73 @@ let actorC: SignerWithAddress;
         })
 
     })
+    describe.only("Smart Wallet Tests", async () => {
+        let smartWalletAddress: string;
 
+        it("setup gives id 0 to actor C", async () => {
+            // Pre conditions
+            console.log(`\tActor C Address: ${actorC.address}`);
+            const tokenId = await RPR.totalSupply();
+            console.log(`\tThe next NFT minted will have ID: \t${tokenId}`);
+            console.log(`\tActor C Pre balance: ${await RPR.balanceOf(actorC.address)}`);
+
+            // Actions
+            await expect (
+                RPR.connect(owner).mint(actorC.address, 1)
+            )
+            .to.emit(RPR, "Mint")
+            .to.emit(RPR, "Transfer")
+
+            // What you expect it to look like afterwards
+            console.log(`\tActor C Post balance: ${await RPR.balanceOf(actorC.address)}`);
+            console.log(`\tOwner of id ${tokenId}: ${await RPR.ownerOf(tokenId)}`);
+            expect(
+                await RPR.ownerOf(tokenId) == actorC.address
+            )
+
+            smartWalletAddress = await RPR.callStatic.getWalletAddressForTokenId(tokenId);
+        })
+        it("should deposit ether to id=0 smart wallet", async () => {
+            console.log(`\tShould deposit ether to id=0 smart wallet`);
+            console.log(`\tSmart Wallet Address: \t${smartWalletAddress}`);
+            console.log(`\tSmart Wallet Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
+
+            await actorA.sendTransaction({value: ethers.utils.parseEther("15"), to: smartWalletAddress});
+
+            console.log(`\tEther sent from Actor A`);
+            console.log(`\tSmart Wallet Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
+        })
+        it("should revert if withdraw isn't from actor C", async () => {
+            console.log(`\tShould revert if withdraw isn't from actor C`);
+            console.log(`\tSmart Wallet Address: \t\t${smartWalletAddress}`);
+            console.log(`\tSmart Wallet Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
+
+            await expect(
+                RPR.connect(actorA).withdrawEther(0)
+            ).to.revertedWith("Only the token owner can withdraw ether");
+            await expect(
+                RPR.connect(actorB).withdrawEther(0)
+            ).to.revertedWith("Only the token owner can withdraw ether");
+
+            console.log(`\tSmart Wallet Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
+
+        })
+        it("should withdraw correctly from actor C", async () => {
+            console.log(`\tshould withdraw correctly from actor C`);
+            console.log(`\tSmart Wallet Address: \t\t${smartWalletAddress}`);
+            console.log(`\tSmart Wallet Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
+            console.log(`\tActor C Balance: \t\t${await ethers.provider.getBalance(actorC.address)}`);
+
+            // Correct withdraw
+            (await RPR.connect(actorC).withdrawEther(0)).wait()
+
+            console.log(`\tSmart Wallet Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
+            console.log(`\tActor C Balance: \t\t${await ethers.provider.getBalance(actorC.address)}`);
+        })
+        it("should deposit Mock20 into id=0", async () => {
+            
+        })
+    })
     describe("Malicious behavior prevention", async () => {
         it("Should Revert on mint > 5 NFTs", async () => {
             expect (await
@@ -369,7 +437,7 @@ let actorC: SignerWithAddress;
         })
     })
 
-    describe("Withdrawing funds", async () => {
+    describe("Withdrawing charity funds", async () => {
         it("Should Withdraw deposited funds to the ownership address", async () => {
             const donation = 1;
     
@@ -446,16 +514,19 @@ let actorC: SignerWithAddress;
         const amountForDevs = 50;
         RPR = await RPR_Factory.deploy(maxBatchSize, collectionSize, seedRoundCap, amountForAuctionAndDevs, amountForDevs, BASE_URI)
 
-        RPR = await RPR_Factory.deploy(5, 10000, 10000, 8500, 500, "firstBaseURI")
         await RPR.deployed();
 
         console.log(`\tContract deployed to: ${RPR.address}`);
 
-        expect (await
+        await expect (
             RPR.connect(actorA).setBaseURI("malicious")
         ).to.reverted;
 
         await RPR.connect(owner).setBaseURI(BASE_URI)
 
+        // Mock ERC
+        const Mock20_Factory = await ethers.getContractFactory("Mock20") as Mock20__factory
+        Mock20 = await Mock20_Factory.deploy("Mock20", "M20")
+        await Mock20.deployed();
     }
 })

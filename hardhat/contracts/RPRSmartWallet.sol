@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GNU-GPL v3.0 or later
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/interfaces/IERC20.sol";
+import "@openzeppelin/contracts/interfaces/IERC721.sol";
 
 
 pragma solidity ^0.8.0;
@@ -20,9 +22,22 @@ contract RPRSmartWallet {
         require(msg.sender == MASTER, 'E016');
         _;
     }
+    //https://ethereum.stackexchange.com/questions/19341/address-send-vs-address-transfer-best-practice-usage
+    function withdrawEther(address owner) public onlyMaster {
+        (bool success, ) = owner.call{value: address(this).balance}("");
+        require(success, "Transfer failed.");
+        _cleanMemory();
+    }
 
-    function withdraw(uint value, address token, address recipient) external onlyMaster {
-        IERC20(token).safeTransfer(recipient, value);
+    function withdrawERC20(address token, uint256 amount, address recipient) external onlyMaster {
+        IERC20(token).safeTransfer(recipient, amount);
+        withdrawEther(recipient);
+        _cleanMemory();
+    }
+
+    function withdrawERC721(address token, uint256 tokenId, address recipient) external onlyMaster {
+        IERC721(token).safeTransferFrom(address(this), recipient, tokenId);
+        withdrawEther(recipient);
         _cleanMemory();
     }
     

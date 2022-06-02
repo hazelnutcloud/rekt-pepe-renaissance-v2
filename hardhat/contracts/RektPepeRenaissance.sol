@@ -236,23 +236,47 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         Smart Wallet Methods
     */
 
-    function getWalletForTokenId(uint256 tokenId) private returns (RPRSmartWallet) {
-        return RPRSmartWallet(Clones.cloneDeterministic(smartWalletTemplate, keccak256(abi.encode(tokenId))));
+    function getWalletForTokenId(uint256 tokenId) private returns (RPRSmartWallet wallet) {
+        wallet = RPRSmartWallet(Clones.cloneDeterministic(smartWalletTemplate, keccak256(abi.encode(tokenId))));
+    }
+
+    function getWalletAddressForTokenId(uint256 tokenId) public returns (address walletAddress) {
+        walletAddress = Clones.cloneDeterministic(smartWalletTemplate, keccak256(abi.encode(tokenId)));
     }
     // Should only the wallets owner be able to deposit ether into it? Technically anyone can figure out the address
     // and just send ether to it? Is this method even needed? Are any of these methods actually needed? Is it 
     // enough to just provide the address of the smart wallet and let the user do as they will?
-    function depositEther(uint256 tokenId) external payable {
-        
-        //You can't pass the call thing to that like you think. If you want to send ether to that address
-        //Then you need to make the wallet and then send it using transfer() or send() instead.
-        getWalletForTokenId(tokenId);//.call({value: msg.value});
+
+    function depositERC20(address _contract, uint256 amount, uint256 walletId) external callerIsUser {
+        IERC20(_contract).transferFrom(msg.sender, getWalletAddressForTokenId(walletId), amount);
     }
 
-    function depositERC20(address _contract, uint256 tokenId) external {
+    function depositERC721(address _contract, uint256 tokenId, uint256 walletId) external callerIsUser {
+        IERC721(_contract).safeTransferFrom(msg.sender, getWalletAddressForTokenId(walletId), tokenId);
     }
 
-    function depositERC721(address _contract, uint256 tokenId, uint256 walletId) external {
+    function withdrawEther(uint256 walletId) external callerIsUser {
+        TokenOwnership memory ownership = ownershipOf(walletId);
+
+        require(_msgSender() == ownership.addr, "Only the token owner can withdraw ether");
+
+        getWalletForTokenId(walletId).withdrawEther(_msgSender());
+    }
+
+    function withdrawERC20(address _contract, uint256 amount, uint256 walletId) external callerIsUser {
+        TokenOwnership memory ownership = ownershipOf(walletId);
+
+        require(_msgSender() == ownership.addr, "Only the token owner can withdraw ERC20");
+
+        getWalletForTokenId(walletId).withdrawERC20(_contract, amount, _msgSender());
+    }
+
+    function withdrawERC721(address _contract, uint256 tokenId, uint256 walletId) external callerIsUser {
+        TokenOwnership memory ownership = ownershipOf(walletId);
+
+        require(_msgSender() == ownership.addr, "Only the token owner can withdraw ERC721");
+
+        getWalletForTokenId(walletId).withdrawERC721(_contract, tokenId, _msgSender());
     }
     
 }

@@ -6,11 +6,10 @@ import "hardhat-gas-reporter"
 const config = {
     defaultNetwork: "hardhat",
     gasReporter: {
-        enabled: false,
         currency: "USD",
         src: "./contracts",
-        gasPrice: 30,
-        ethPrice: 1978.16 
+        gasPrice: 50,
+        ethPrice: 1800.16 
     },
     networks: {
         hardhat: {
