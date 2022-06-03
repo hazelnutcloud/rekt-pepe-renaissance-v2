@@ -77,10 +77,9 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         _burn(tokenId);
     }
     function transfer(address from, address to, uint256 tokenId) public {
-        require(from == msg.sender);
         safeTransferFrom(from, to, tokenId);
     }
-
+ 
     function seedRoundMint(uint256 quantity) external payable callerIsUser {
         uint256 price = uint256(saleConfig.seedRoundPrice);
         require(price != 0, "Seed round not yet started");
