@@ -60,15 +60,21 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     }
     function payable_mint(address to, uint256 quantity) public payable returns (bool) {
         require(quantity <= maxBatchSize, "Max mint of 5");
-        require(msg.value >= 5 ether * quantity, "Insufficient funds for floor price");
+        require(msg.value >= 1 ether * quantity, "Insufficient funds for floor price");
         _safeMint(to, quantity);
         emit Mint(to, quantity);
     }
+    /*
+        WARNING:    BURNING TOKENS WITH ASSETS REMAINING IN THEIR 
+                    ASSOCIATED SMART WALLET WILL RESULT IN THE ASSETS BEING LOST FOREVER.
+    */
     function burn(uint256 tokenId) public {
-        require(ownerOf(tokenId) == msg.sender);
-        // This is effectively the same as burning? ERC721 doesn't require a burn() implementation.
-        safeTransferFrom(msg.sender, address(0), tokenId);
-        emit Burn(tokenId);
+        bool isApprovedOrOwner = (_msgSender() == prevOwnership.addr ||
+            getApproved(tokenId) == _msgSender() ||
+            isApprovedForAll(prevOwnership.addr, _msgSender()));
+
+        require(isApprovedOrOwner, "You are not the owner or approved");
+        _burn(tokenId);
     }
     function transfer(address from, address to, uint256 tokenId) public {
         require(from == msg.sender);

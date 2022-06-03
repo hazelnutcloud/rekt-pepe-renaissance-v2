@@ -456,6 +456,43 @@ contract ERC721A is
     emit Approval(owner, to, tokenId);
   }
 
+    /**
+    * @dev Destroys `tokenId`.
+    * The approval is cleared when the token is burned.
+    *
+    * Requirements:
+    *
+    * - `tokenId` must exist.
+    *
+    * Emits a {Transfer} event.
+    */
+  function _burn(uint256 tokenId) internal virtual {
+      TokenOwnership memory prevOwnership = ownershipOf(tokenId);
+
+      _beforeTokenTransfer(prevOwnership.addr, address(0), tokenId);
+
+      // Clear approvals
+      _approve(address(0), tokenId);
+
+      _addressData[owner] -= 1;
+      delete _ownerships[tokenId];
+
+      // If the ownership slot of tokenId+1 is not explicitly set, that means the transfer initiator owns it.
+      // Set the slot of tokenId+1 explicitly in storage to maintain correctness for ownerOf(tokenId+1) calls.
+      uint256 nextTokenId = tokenId + 1;
+      if (_ownerships[nextTokenId].addr == address(0)) {
+        if (_exists(nextTokenId)) {
+          _ownerships[nextTokenId] = TokenOwnership(
+            prevOwnership.addr,
+            prevOwnership.startTimestamp
+          );
+        }
+      }
+
+      emit Transfer(owner, address(0), tokenId);
+      _afterTokenTransfer(owner, address(0), tokenId);
+  }
+
   uint256 public nextOwnerToExplicitlySet = 0;
 
   /**

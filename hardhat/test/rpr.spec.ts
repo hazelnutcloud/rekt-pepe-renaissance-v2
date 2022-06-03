@@ -21,10 +21,11 @@ let owner: SignerWithAddress;
 let actorA: SignerWithAddress;
 let actorB: SignerWithAddress;
 let actorC: SignerWithAddress;
+let actorD: SignerWithAddress;
 const BASE_URI = "ipfs-example/";
     //let actorA: SignerWithAddress;
     before(async () => {
-        [owner, actorA, actorB, actorC] = await ethers.getSigners()
+        [owner, actorA, actorB, actorC, actorD] = await ethers.getSigners()
     
         await main();
     });
@@ -87,28 +88,28 @@ const BASE_URI = "ipfs-example/";
                     RPR.connect(actorA).seedAllowlist([actorA.address, actorB.address], [10, 2])
                 ).to.reverted;;
             })
-            it("should seed the allowlist", async () => {
+            it("should accept owner attempt to seed the allowlist", async () => {
                 await RPR.connect(owner).seedAllowlist([actorA.address, actorB.address], [10, 2])
             })
 
-            it("should mint during the seed round", async () => {
+            it("should accept Actor A's 10 token mint during the seed round", async () => {
                 expect (await
                     RPR.connect(actorA).seedRoundMint(10, {value: ethers.utils.parseEther("0.07")})
                 )
                 .to.emit(RPR, "Mint")
                 .withArgs(actorA.address, 10)
-                console.log(`\tActor A minted 10 tokens`);
-                expect (await
-                    RPR.connect(actorB).seedRoundMint(2, {value: ethers.utils.parseEther("0.07")})
-                )
-                .to.emit(RPR, "Mint")
-                .withArgs(actorB.address, 2)
-                console.log(`\tActor B minted 2 tokens`);
                 for (let i = 0; i < 10; i++) {
                     expect(
                         await RPR.ownerOf(i)
                     ).to.eq(actorA.address)
                 }
+            })
+            it("should accept Actor B's 2 token mint during the seed round", async () => {
+                expect (await
+                    RPR.connect(actorB).seedRoundMint(2, {value: ethers.utils.parseEther("0.07")})
+                )
+                .to.emit(RPR, "Mint")
+                .withArgs(actorB.address, 2)
                 for (let i = 10; i < 12; i++) {
                     expect(
                         await RPR.ownerOf(i)
@@ -137,64 +138,139 @@ const BASE_URI = "ipfs-example/";
                     RPR.connect(actorC).preSaleMint(5, {value: ethers.utils.parseEther("4.0")})
                 ).to.revertedWith("Pre-sale not yet started")
             })
+            it("should reject public sale mint attempts", async () => {
+                await expect (
+                    RPR.connect(actorA).publicSaleMint(5, {value: ethers.utils.parseEther("4.0")})
+                ).to.revertedWith("public sale has not begun yet")
+                await expect (
+                    RPR.connect(actorB).publicSaleMint(5, {value: ethers.utils.parseEther("4.0")})
+                ).to.revertedWith("public sale has not begun yet")
+                await expect (
+                    RPR.connect(actorC).publicSaleMint(5, {value: ethers.utils.parseEther("4.0")})
+                ).to.revertedWith("public sale has not begun yet")
+            })
         })
 
         describe("Presale", async () => {
-            const preSaleStartTime = 1652893100;
-            it("Should fail to mint before the presale", async () => {
-                await getTimestamp();
+            it("Should revert presale mints until the presale timestamp: " + preSaleStartTime.toString(), async () => {
                 console.log(`\tRevert pre sale mints until presale start time`);
                 while ((await ethers.provider.getBlock('latest')).timestamp + 1 < preSaleStartTime) {
-                    expect (await
+                    await expect (
                         RPR.preSaleMint(5, {value: ethers.utils.parseEther("4.0")})
                     ).to.revertedWith("Pre-sale not yet started")
-                    console.log(`\Reverted: \tstamp ${(await ethers.provider.getBlock('latest')).timestamp} < ${preSaleStartTime}`);
+                    console.log(`\t\tReverted: \tstamp ${(await ethers.provider.getBlock('latest')).timestamp} < ${preSaleStartTime}`);
                 }
-                await getTimestamp();
-                console.log(`\t***Presale has begun, the NEXT tx will go through***`);
             })
-
-            it("Shoud revert seed sale mint", async () => {
-                await getTimestamp();
-                expect (await
-                    RPR.connect(actorA).seedRoundMint(1)
-                ).to.revertedWith("seed round is over")
-                console.log(`\tProperly reverted seed sale mint`);
-                await getTimestamp();
-            })
-
-            it("Should fail to mint more than the allowed amount", async () => {
-                expect (await
-                    RPR.connect(actorC).preSaleMint(6, {value: ethers.utils.parseEther("4.0")})
+            it("should revert Actor C's attempt to mint more than the allowed amount in pre-sale", async () => {
+                console.log(`\t***Presale has begun, seed round is over***`);
+                const c_bal = await ethers.provider.getBalance(actorC.address);
+                const rpr_bal = await ethers.provider.getBalance(RPR.address);
+                await expect (
+                    RPR.connect(actorC).preSaleMint(20, {value: ethers.utils.parseEther("4.0")})
                 ).to.revertedWith("can not mint this many")
-                console.log(`\tActor C tried to mint 6 more tokens, reverted`);
-                console.log(`\tActor C's balance: \t${await RPR.balanceOf(actorC.address)}`);
-
-                //include an assertion here for making sure ether value hasn't changed.
+                // Actor C should have no tokens from seed sale
+                expect (await RPR.balanceOf(actorC.address)).to.eq(0)
+                expect ((await ethers.provider.getBalance(actorC.address)).lt(c_bal))
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal)
             })
 
-            it("should mint an allowed amount during the pre sale", async () => {
-                expect (await
-                    RPR.connect(actorC).preSaleMint(5, {value: ethers.utils.parseEther("4.0")})
+            it("should accept Actor C's attempt to mint 5 tokens during the pre sale", async () => {
+                const c_bal = await ethers.provider.getBalance(actorC.address);
+                const rpr_bal = await ethers.provider.getBalance(RPR.address);
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal.add(ethers.utils.parseEther("0.0")))
+
+                await expect (
+                    RPR.connect(actorC).preSaleMint(10, {value: ethers.utils.parseEther("8.0")})
                 ).to.emit(RPR, "Mint")
-                .withArgs(actorC.address, 5)
-                console.log(`\tActor C minted 5 tokens`);
-                console.log(`\tActor C's balance: \t${await RPR.balanceOf(actorC.address)}`);
+                .withArgs(actorC.address, 10)
 
-                //include an assertion for Ether value before and after mint
-                //include assertion for RPR balance instead of just printing
+                expect (await RPR.balanceOf(actorC.address)).to.eq(10)
+                expect ((await ethers.provider.getBalance(actorC.address)).lt(c_bal.sub(ethers.utils.parseEther("8.0"))))
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal.add(ethers.utils.parseEther("8.0")))
+            })
+            it("should revert Actor C's attempt to mint an additional token in pre-sale", async () => {
+                const c_bal = await ethers.provider.getBalance(actorC.address);
+                const rpr_bal = await ethers.provider.getBalance(RPR.address);
+                await expect (
+                    RPR.connect(actorC).preSaleMint(1, {value: ethers.utils.parseEther("4.0")})
+                ).to.revertedWith("can not mint this many")
+                // Actor C should have no tokens from seed sale
+                expect (await RPR.balanceOf(actorC.address)).to.eq(10)
+                expect ((await ethers.provider.getBalance(actorC.address)).lt(c_bal))
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal)
+            })
+            it("shoud revert Actor A's attempt to seed round mint", async () => {
+                await expect (
+                    RPR.connect(actorA).seedRoundMint(1, {value: ethers.utils.parseEther("1")})
+                ).to.revertedWith("seed round is over")
+            })
+            it("shoud revert Actor A's attempt to public sale mint", async () => {
+                await expect (
+                    RPR.connect(actorA).publicSaleMint(1)
+                ).to.revertedWith("public sale has not begun yet")
+            })
+        })
+        describe("Public Sale", async () => {
+            const publicSaleStartTime = preSaleStartTime + 14400; // PreSaleTimestamp + uint256(4 hours)
+            it("Should revert presale mints until the public sale timestamp: " + publicSaleStartTime.toString(), async () => {
+                console.log(`\tRevert public sale mints until public start time`);
+                await network.provider.send("evm_increaseTime", [14390]);
+
+                while ((await ethers.provider.getBlock('latest')).timestamp + 1 < publicSaleStartTime) {
+                    await expect (
+                        RPR.publicSaleMint(5, {value: ethers.utils.parseEther("5.0")})
+                    ).to.revertedWith("public sale has not begun yet")
+                    console.log(`\t\tReverted: \tstamp ${(await ethers.provider.getBlock('latest')).number} < ${publicSaleStartTime}`);
+                }
             })
 
-           
+            it("should revert Actor D's attempt to mint more than the allowed amount in Public -sale", async () => {
+                console.log(`\t***Public sale has begun, pre sale is over***`);
+                const c_bal = await ethers.provider.getBalance(actorD.address);
+                const rpr_bal = await ethers.provider.getBalance(RPR.address);
+                await expect (
+                    RPR.connect(actorD).publicSaleMint(20, {value: ethers.utils.parseEther("20.0")})
+                ).to.revertedWith("can not mint this many")
+                // Actor C should have no tokens from seed sale
+                expect (await RPR.balanceOf(actorD.address)).to.eq(0)
+                expect ((await ethers.provider.getBalance(actorD.address)).lt(c_bal))
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal)
+            })
 
-            it("should fail to mint over the allowed amount during the pre-sale", async () => {
-                expect (await
-                    RPR.connect(actorC).publicSaleMint(1, {value: ethers.utils.parseEther("4.0")})
-                ).to.revertedWith("public sale has not begun yet")
-                console.log(`\tActor C tried to public mint 1 more token, reverted`);
-                console.log(`\tActor C's balance: \t${await RPR.balanceOf(actorC.address)}`);
+            it("should accept Actor D's attempt to mint 10 tokens during the pre sale", async () => {
+                const c_bal = await ethers.provider.getBalance(actorD.address);
+                const rpr_bal = await ethers.provider.getBalance(RPR.address);
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal.add(ethers.utils.parseEther("0.0")))
 
-                //include assertion for RPR Balance
+                await expect (
+                    RPR.connect(actorD).publicSaleMint(10, {value: ethers.utils.parseEther("10.0")})
+                ).to.emit(RPR, "Mint")
+                .withArgs(actorD.address, 10)
+
+                expect (await RPR.balanceOf(actorD.address)).to.eq(10)
+                expect ((await ethers.provider.getBalance(actorD.address)).lt(c_bal.sub(ethers.utils.parseEther("10.0"))))
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal.add(ethers.utils.parseEther("10.0")))
+            })
+            it("should revert Actor D's attempt to mint an additional token in pre-sale", async () => {
+                const c_bal = await ethers.provider.getBalance(actorD.address);
+                const rpr_bal = await ethers.provider.getBalance(RPR.address);
+                await expect (
+                    RPR.connect(actorD).publicSaleMint(1, {value: ethers.utils.parseEther("1.0")})
+                ).to.revertedWith("can not mint this many")
+                // Actor C should have no tokens from seed sale
+                expect (await RPR.balanceOf(actorD.address)).to.eq(10)
+                expect ((await ethers.provider.getBalance(actorD.address)).lt(c_bal))
+                expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal)
+            })
+            it("shoud revert Actor B's attempt to seed round mint", async () => {
+                await expect (
+                    RPR.connect(actorD).seedRoundMint(1) 
+                ).to.revertedWith("seed round is over")
+            })
+            it("shoud revert Actor B's attempt to pre sale mint", async () => {
+                await expect (
+                    RPR.connect(actorD).preSaleMint(1, {value: ethers.utils.parseEther("1")})
+                ).to.revertedWith("Pre-sale not yet started")
             })
         })
     })
@@ -292,7 +368,7 @@ const BASE_URI = "ipfs-example/";
             expect (await
                 RPR.connect(actorA).burn(0)
             )
-            .to.emit(RPR, "Burn")
+            .to.emit(RPR, "Transfer")
             
             // What you expect it to look like afterwards
             console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
