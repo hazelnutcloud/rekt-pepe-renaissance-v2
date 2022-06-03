@@ -248,11 +248,11 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     // enough to just provide the address of the smart wallet and let the user do as they will?
 
     function depositERC20(address _contract, uint256 amount, uint256 walletId) external callerIsUser {
-        IERC20(_contract).transferFrom(msg.sender, getWalletAddressForTokenId(walletId), amount);
+        IERC20(_contract).transferFrom(_msgSender(), getWalletAddressForTokenId(walletId), amount);
     }
 
     function depositERC721(address _contract, uint256 tokenId, uint256 walletId) external callerIsUser {
-        IERC721(_contract).safeTransferFrom(msg.sender, getWalletAddressForTokenId(walletId), tokenId);
+        IERC721(_contract).safeTransferFrom(_msgSender(), getWalletAddressForTokenId(walletId), tokenId);
     }
 
     function withdrawEther(uint256 walletId) external callerIsUser {
