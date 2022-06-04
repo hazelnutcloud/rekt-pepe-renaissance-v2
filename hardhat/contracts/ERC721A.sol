@@ -469,12 +469,12 @@ contract ERC721A is
   function _burn(uint256 tokenId) internal virtual {
       TokenOwnership memory prevOwnership = ownershipOf(tokenId);
 
-      _beforeTokenTransfer(prevOwnership.addr, address(0), tokenId);
+      // _beforeTokenTransfers(prevOwnership.addr, address(0), tokenId);
 
       // Clear approvals
-      _approve(address(0), tokenId);
+      _approve(address(0), tokenId, prevOwnership.addr);
 
-      _addressData[owner] -= 1;
+      _addressData[prevOwnership.addr].balance -= 1;
       delete _ownerships[tokenId];
 
       // If the ownership slot of tokenId+1 is not explicitly set, that means the transfer initiator owns it.
@@ -489,8 +489,8 @@ contract ERC721A is
         }
       }
 
-      emit Transfer(owner, address(0), tokenId);
-      _afterTokenTransfer(owner, address(0), tokenId);
+      emit Transfer(prevOwnership.addr, address(0), tokenId);
+      // _afterTokenTransfers(prevOwnership.addr, address(0), tokenId);
   }
 
   uint256 public nextOwnerToExplicitlySet = 0;

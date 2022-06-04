@@ -69,9 +69,9 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
                     ASSOCIATED SMART WALLET WILL RESULT IN THE ASSETS BEING LOST FOREVER.
     */
     function burn(uint256 tokenId) public {
-        bool isApprovedOrOwner = (_msgSender() == prevOwnership.addr ||
+        bool isApprovedOrOwner = (_msgSender() == ownerOf(tokenId) ||
             getApproved(tokenId) == _msgSender() ||
-            isApprovedForAll(prevOwnership.addr, _msgSender()));
+            isApprovedForAll(ownerOf(tokenId), _msgSender()));
 
         require(isApprovedOrOwner, "You are not the owner or approved");
         _burn(tokenId);
@@ -139,9 +139,9 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     }
 
     function refundIfOver(uint256 price) private {
-        require(msg.value >= price, "Need to send more ETH.");
+        require(msg.value >= price, "Insufficient funds");
         if (msg.value > price) {
-        payable(msg.sender).transfer(msg.value - price);
+            payable(msg.sender).transfer(msg.value - price);
         }
     }
 

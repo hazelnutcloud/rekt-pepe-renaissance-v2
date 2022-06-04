@@ -1,0 +1,3 @@
+{
+    "remappings": [ "@openzeppelin/=/test_container/node_modules/@openzeppelin/" ]
+}

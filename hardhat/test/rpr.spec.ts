@@ -23,10 +23,11 @@ let actorA: SignerWithAddress;
 let actorB: SignerWithAddress;
 let actorC: SignerWithAddress;
 let actorD: SignerWithAddress;
+let actorE: SignerWithAddress;
 const BASE_URI = "ipfs-example/";
     //let actorA: SignerWithAddress;
     before(async () => {
-        [owner, actorA, actorB, actorC, actorD] = await ethers.getSigners()
+        [owner, actorA, actorB, actorC, actorD, actorE] = await ethers.getSigners()
     
         await main();
     });
@@ -275,112 +276,56 @@ const BASE_URI = "ipfs-example/";
             })
         })
     })
-        
     describe("Minting/Burning General", async () => {
-        it("Should Mint 1 NFT", async () => {
+        it("should revert Actor E attempt to mint under price", async () => {
             // Pre conditions
-            console.log(`\tAddress: ${actorA.address}`);
-            console.log(`\tPre balance: ${await RPR.balanceOf(actorA.address)}`);
-
-            expect(await
-                RPR.balanceOf(actorA.address)
-            )
-            .to.eq(0)
+            const pre_bal = await ethers.provider.getBalance(actorE.address);
+            expect(await RPR.balanceOf(actorE.address)).to.eq(0)
 
             // Actions
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 1, {value: ethers.utils.parseEther("5")})
-            )
-            .to.emit(RPR, "Mint")
-            .to.emit(RPR, "Transfer")
+            await expect (
+                RPR.connect(actorE).publicSaleMint(1, {value: ethers.utils.parseEther("0.05")})
+            ).to.revertedWith("Insufficient funds")
 
-            // BaseURI
-            expect (await
-                RPR.tokenURI(0)
-            ).to.eq(BASE_URI + "0")
-            console.log(`\tToken URI: \t${await RPR.tokenURI(0)}`);
-            // What you expect it to look like afterwards
-            console.log(`\tPost balance: ${await RPR.balanceOf(actorA.address)}`);
-            console.log(`\tOwner of id 0: ${await RPR.ownerOf(0)}`);
+            expect(await RPR.balanceOf(actorE.address)).to.eq(0)
 
-            expect(
-                await RPR.ownerOf(0) == actorA.address
-            )
-
-            expect(await
-                RPR.balanceOf(actorA.address)
-            )
-            .to.eq(1)
         })
-
-        it("Should mint 2 more NFTs", async () => {
-            // Pre conditions
-            console.log(`\tAddress: ${actorA.address}`);
-            console.log(`\tPre balance: ${await RPR.balanceOf(actorA.address)}`);
-
-            expect(await
-                RPR.balanceOf(actorA.address)
-            )
-            .to.eq(1)
+        it("should accept Actor E attempting to mint 1 NFT perfect price", async () => {
+            const pre_bal = await ethers.provider.getBalance(actorE.address);
+            const index = await RPR.totalSupply();
+            expect(await RPR.balanceOf(actorE.address)).to.eq(0)
 
             // Actions
-            expect (await
-                RPR.connect(owner).mint(actorA.address, 2)
-            )
-            .to.emit(RPR, "Mint")
-            .to.emit(RPR, "Transfer")
-          
-            // What you expect it to look like afterwards
-            console.log(`\tPost balance: ${await RPR.balanceOf(actorA.address)}`);
-            for (let i = 0; i < 2; i++) {
-                console.log(`\tOwner of id ${i + 1}: ${await RPR.ownerOf(i)}`);
-            }
+            await expect (
+                RPR.connect(actorE).publicSaleMint(1, {value: ethers.utils.parseEther("1.0")})
+            ).to.emit(RPR, "Transfer")
+            .withArgs(ethers.constants.AddressZero, actorE.address, index)
 
-            for (let i = 1; i < 3; i++) {
-                expect(
-                    await RPR.ownerOf(i) == actorA.address
-                )
-            }
-
-            expect(await
-                RPR.balanceOf(actorA.address)
-            )
-            .to.eq(3)
+            expect(await RPR.ownerOf(index)).to.eq(actorE.address)
+            expect((await RPR.balanceOf(actorE.address)).eq(1))
+            expect((await ethers.provider.getBalance(actorE.address)).lt(pre_bal.sub(ethers.utils.parseEther("1.0"))))
         })
-
-        it("Should batch mint 5 more NFTs", async () => {
+        it("should accept Actor E attempting to mint 2 NFTs overflow price", async () => {
             // Pre conditions
-            console.log(`\tAddress: ${actorA.address}`);
-            console.log(`\tPre balance: ${await RPR.balanceOf(actorA.address)}`);
-
-            expect(await
-                RPR.balanceOf(actorA.address)
-            )
-            .to.eq(3)
-
+            const rpr_bal = await RPR.balanceOf(actorE.address);
+            const pre_bal = await ethers.provider.getBalance(actorE.address);
+            const pre_con_bal = await ethers.provider.getBalance(RPR.address);
+            const index = await RPR.totalSupply();
             // Actions
             expect (await
-                RPR.connect(owner).mint(actorA.address, 5)
+                RPR.connect(actorE).publicSaleMint(2, {value: ethers.utils.parseEther("3.0")})
             )
-            .to.emit(RPR, "Mint")
             .to.emit(RPR, "Transfer")
+            .withArgs(ethers.constants.AddressZero, actorE.address, index)
+            .to.emit(RPR, "Transfer")
+            .withArgs(ethers.constants.AddressZero, actorE.address, index.add(1))
           
-            // What you expect it to look like afterwards
-            console.log(`\tPost balance: ${await RPR.balanceOf(actorA.address)}`);
-            for (let i = 0; i < 5; i++) {
-                console.log(`\tOwner of id ${i + 1}: ${await RPR.ownerOf(i)}`);
-            }
-
-            for (let i = 3; i < 8; i++) {
-                expect(
-                    await RPR.ownerOf(i) == actorA.address
-                )
-            }
-
-            expect(await
-                RPR.balanceOf(actorA.address)
-            )
-            .to.eq(8)
+            expect(await RPR.ownerOf(index)).to.eq(actorE.address)
+            expect(await RPR.ownerOf(index.add(1))).to.eq(actorE.address)
+            expect(await RPR.balanceOf(actorE.address)).to.eq(rpr_bal.add(2))
+            expect((await actorE.getBalance()).lt(pre_bal.sub(ethers.utils.parseEther("2.0"))))
+            expect((await actorE.getBalance()).gt(pre_bal.sub(ethers.utils.parseEther("2.9"))))
+            expect((await ethers.provider.getBalance(RPR.address)).sub(pre_con_bal)).to.eq(ethers.utils.parseEther("2.0"))
         })
         it("Burn 1 NFT", async () => {
             // Pre conditions
@@ -391,12 +336,12 @@ const BASE_URI = "ipfs-example/";
             //I was wrong about the burn() method. You can just test burning it by sending it to the zero-address.
 
             // Actions
-            expect (await
+            await expect (
                 RPR.connect(actorB).burn(0)
             )
             .to.be.reverted
 
-            expect (await
+            await expect (
                 RPR.connect(actorA).burn(0)
             )
             .to.emit(RPR, "Transfer")
@@ -406,35 +351,26 @@ const BASE_URI = "ipfs-example/";
             
             //Add Assertions about balances
         })
-       
-            
-       
     })
-
-    describe.only("Transfer", async () => {
+    describe("Transfer", async () => {
+        let index: BigNumber;
         it("should transfer a single NFT", async () => {
             // Pre conditions
-            console.log(`\tActor A Address: ${actorA.address}`);
+            index = await RPR.totalSupply();
             await RPR.connect(owner).mint(actorA.address, 1)
-            console.log(`\tActor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
-            console.log(`\tActor B Address: ${actorB.address}`);
-            console.log(`\tActor B Pre balance: ${await RPR.balanceOf(actorB.address)}`);
 
             // Actions
             await expect (
-                RPR.connect(actorB).transfer(actorA.address, actorB.address, 0)
-            )
-            .to.be.reverted
+                RPR.connect(actorB).transfer(actorA.address, actorB.address, index)
+            ).to.be.reverted;
 
             await expect(
-                RPR.connect(actorA).transfer(actorA.address, actorB.address, 0)
-            )
-            .to.emit(RPR, "Transfer")
+                RPR.connect(actorA).transfer(actorA.address, actorB.address, index)
+            ).to.emit(RPR, "Transfer")
 
             expect(await
-                RPR.ownerOf(0)
-            )
-            .to.eq(actorB.address)
+                RPR.ownerOf(index)
+            ).to.eq(actorB.address)
 
             // What you expect it to look like afterwards
             console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
@@ -444,50 +380,24 @@ const BASE_URI = "ipfs-example/";
         it("should transfer via allowance", async () => {
             // RPR.approve() tx.wait()
             // Pre conditions
-            console.log(`Actor A Address: ${actorA.address}`);
-            console.log(`Actor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
-            console.log(`Actor B Address: ${actorB.address}`);
-            console.log(`Actor B Pre balance: ${await RPR.balanceOf(actorB.address)}`);
-            console.log(`Actor C Address: ${actorC.address}`);
-            console.log(`Actor C Pre balance: ${await RPR.balanceOf(actorC.address)}`);
             
             // Actions
             await expect(
-                RPR.connect(actorC).transfer(actorB.address, actorC.address, 0)
+                RPR.connect(actorC).transfer(actorB.address, actorC.address, index)
             )
             .to.be.reverted
 
-            RPR.connect(actorB).approve(actorA.address, 0)
+            RPR.connect(actorB).approve(actorA.address, index)
 
             expect(await
-                RPR.connect(actorA).transfer(actorB.address, actorA.address, 0)
+                RPR.connect(actorA).transfer(actorB.address, actorA.address, index)
             )
             .to.emit(RPR, "Transfer")
 
             expect(await
-                RPR.balanceOf(actorA.address)
-            )
-            .to.eq(1)
-
-            expect(await
-                RPR.balanceOf(actorB.address)
-            )
-            .to.eq(0)
-
-            expect(await
-                RPR.balanceOf(actorC.address)
-            )
-            .to.eq(0)
-
-            expect(await
-                RPR.ownerOf(0)
+                RPR.ownerOf(index)
             )
             .to.eq(actorA.address)
-
-            // What you expect it to look like afterwards
-            console.log(`Actor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
-            console.log(`Actor B Pre balance: ${await RPR.balanceOf(actorB.address)}`);
-            console.log(`Actor C Pre balance: ${await RPR.balanceOf(actorC.address)}`);
         })
 
         it("should transfer ownership of contract", async () => {
@@ -768,66 +678,25 @@ const BASE_URI = "ipfs-example/";
             ).to.revertedWith("RPR: insufficient funds")
         })
     })
-
     describe("Withdrawing charity funds", async () => {
         it("Should Withdraw deposited funds to the ownership address", async () => {
-            const donation = 1;
+            const owner_bal = await ethers.provider.getBalance(owner.address);
+            const rpr_bal = await ethers.provider.getBalance(RPR.address);
     
-            const pre_bal1 = await ethers.provider.getBalance(actorA.address);
-            console.log(`\tActor A pre balance: ${pre_bal1}`);
-            //Send funds to address
-            const tx0 = await RPR.connect(actorA).payable_mint(actorA.address, 5, {value: ethers.utils.parseEther("5")});
-            tx0.wait();
-            const post_bal1 = await ethers.provider.getBalance(actorA.address);
-            console.log(`\tActor A post balance: ${post_bal1}`);
-    
-            const pre_bal2 = await ethers.provider.getBalance(actorB.address);
-            console.log(`\tActor B pre balance: ${pre_bal2}`);
-            //Send funds to address
-            const tx1 = await RPR.connect(actorB).payable_mint(actorB.address, 2, {value: ethers.utils.parseEther("2")});
-            tx1.wait();
-            const post_bal2 = await ethers.provider.getBalance(actorB.address);
-            console.log(`\tActor B post balance: ${post_bal2}`);
-    
-            const pre_bal3 = await ethers.provider.getBalance(actorC.address);
-            console.log(`\tActor C pre balance: ${pre_bal3}`);
-            //Send funds to address
-            const tx2 = await RPR.connect(actorC).payable_mint(actorC.address, 2, {value: ethers.utils.parseEther("2")});
-            tx2.wait();
-            const post_bal3 = await ethers.provider.getBalance(actorC.address);
-            console.log(`\tActor C post balance: ${post_bal3}`);
-    
-            const totalDeposit = (pre_bal1.sub(post_bal1)).add(pre_bal2.sub(post_bal2)).add(pre_bal3.sub(post_bal3))
-            console.log(`\tTotal Deposit: \t${totalDeposit.toString()}`);
-            const contract_balance = await ethers.provider.getBalance(RPR.address);
-            console.log(`\tBalance of contract: ${contract_balance}`);
-            expect(totalDeposit == contract_balance);
-    
-            expect( await
+            await expect(
                 RPR.connect(actorA).withdrawCharity()
-            ).to.reverted
+            ).to.reverted;
     
             await RPR.connect(owner).withdrawCharity();
     
-            console.log(`\tOwner balance: ${await ethers.provider.getBalance(owner.address)}`);
-            console.log(`\tContract balance: ${await ethers.provider.getBalance(RPR.address)}`);
-    
-            expect(
-                await ethers.provider.getBalance(RPR.address)
-            ).to.eq(0)  
+            expect(await ethers.provider.getBalance(RPR.address)).to.eq(0);
+            expect((rpr_bal.add(owner_bal).sub(await ethers.provider.getBalance(owner.address))).lt(ethers.utils.parseEther("0.01")))
         })
     })
 
     // What API for this? Seaport?
     describe("List on OpenSea", async () => {
         it("Should list NFT on opensea?", async () => {
-            
-        })
-    })
-
-    // Do last
-    describe("Smart Wallet suite", async () => {
-        it("I don't know what he wants here.", async () => {
             
         })
     })
