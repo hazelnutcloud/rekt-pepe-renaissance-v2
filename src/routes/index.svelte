@@ -17,7 +17,8 @@
     import TiHeart from 'svelte-icons/ti/TiHeart.svelte';
     import { shouldShowActions, appVersionIndex } from '../stores.js';
 	import Discord from "$lib/components/Icons/Discord.svelte";
-    import Medium from "../../static/images/icons/medium-cropped.svelte";
+    import Medium from "$lib/components/Icons/medium-cropped.svelte";
+
     let submitted = false;
     let focused = false;
     let value: string | null = null;
@@ -175,7 +176,7 @@
                 <h2>
                     {`Thank You for purchasing ${amountOfNftsToPurchase} ${pluralize(
                         'Spirit NFT',
-                        amountOfNftsToPurchase,
+                        amountOfNftsToPurchase
                     )}!`}
                 </h2>
                 <span class="heart-icon">
