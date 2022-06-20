@@ -90,7 +90,7 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         // Might be able to do this unchecked
         allowlist[msg.sender] -= quantity;
         _safeMint(msg.sender, quantity);
-        refundIfOver(price);
+        refundIfOver(quantity * price);
         emit Mint(msg.sender, quantity);
     }
     // param2 is currently unused
