@@ -24,28 +24,30 @@ let actorB: SignerWithAddress;
 let actorC: SignerWithAddress;
 let actorD: SignerWithAddress;
 let actorE: SignerWithAddress;
+let actorF: SignerWithAddress;
 const BASE_URI = "ipfs-example/";
     //let actorA: SignerWithAddress;
     before(async () => {
-        [owner, actorA, actorB, actorC, actorD, actorE] = await ethers.getSigners()
+        [owner, actorA, actorB, actorC, actorD, actorE, actorF] = await ethers.getSigners()
     
         await main();
     });
 
     describe("Sale mechanics", async () => {
+        const seedRoundStartTime = 1652893050;
         const preSaleStartTime = 1652893100;
         const publicSalePrice = ethers.utils.parseEther("1.0")
         const preSalePrice = ethers.utils.parseEther("0.8");
+        const seedSalePrice = ethers.utils.parseEther("0.07");
         describe("setup", async () => {
             it("should set sale config", async () => {
                 await getTimestamp();
 
-                (await RPR.setSaleConfig(preSaleStartTime, publicSalePrice, preSalePrice)).wait()
+                (await RPR.setSaleConfig(seedRoundStartTime, preSaleStartTime, seedSalePrice, preSalePrice, publicSalePrice)).wait()
 
                 console.log(`\tSale Config:`);
+                console.log(`\tSeed sale start time: \t${seedRoundStartTime}`);
                 console.log(`\tPre sale start time: \t${preSaleStartTime}`);
-                console.log(`\tPublic sale price: \t${publicSalePrice}`);
-                console.log(`\tPre Sale Price: \t${preSalePrice}`);
                 
                 await getTimestamp();
             })
@@ -53,37 +55,23 @@ const BASE_URI = "ipfs-example/";
 
         describe("Seed round", async () => {
             it("should revert attempts to mint before the seed round", async () => {
-                for (let i = 0; i < 5; i++) {
+                while ((await ethers.provider.getBlock('latest')).timestamp + 1 < seedRoundStartTime) {
                     await expect (
-                        RPR.seedRoundMint(1, {value: ethers.utils.parseEther("0.07")})
-                    ).to.revertedWith("Seed round not yet started")
-                    await getTimestamp();
+                        RPR.mint(5, {value: ethers.utils.parseEther("4.0")})
+                    ).to.revertedWith("Sale not yet started")
+                    console.log(`\t\tReverted: \tstamp ${(await ethers.provider.getBlock('latest')).timestamp} < ${seedRoundStartTime}`);
                 }
                 expect(await RPR.totalSupply()).eq(0);
-                console.log(`\tFive transactions properly rejected before seed round `);
             })
-            
-            it("should revert foreign attempt to activate seed round", async () => {
-                await expect(
-                    RPR.connect(actorA).enableSeedRound()
-                ).to.reverted;
-            })
-            it("should accept owner attempt to activate seed round", async () => {
-                await RPR.connect(owner).enableSeedRound()
-
-                //Expect seedRoundPrice to have changed
-                expect((await RPR.saleConfig()).seedRoundPrice).to.be.gt(0);
-            })
-
             it("should reject ineligible minters", async () => {
                 console.log(`\tseed round activated`);
                 await expect(
                     RPR.connect(actorB).seedRoundMint(1, {value: ethers.utils.parseEther("0.07")})
-                ).to.revertedWith("Ineligible for seed round mint")
+                ).to.revertedWith("Attempting to mint more than allowed")
 
                 await expect(
                     RPR.connect(actorC).seedRoundMint(1, {value: ethers.utils.parseEther("0.07")})
-                ).to.revertedWith("Ineligible for seed round mint")
+                ).to.revertedWith("Attempting to mint more than allowed")
             })
             it("should reject foreign attempt to seed allowlist", async () => {
                 await expect(
@@ -95,8 +83,8 @@ const BASE_URI = "ipfs-example/";
             })
 
             it("should accept Actor A's 10 token mint during the seed round", async () => {
-                expect (await
-                    RPR.connect(actorA).seedRoundMint(10, {value: ethers.utils.parseEther("0.07")})
+                await expect (
+                    RPR.connect(actorA).seedRoundMint(10, {value: ethers.utils.parseEther("0.70")})
                 )
                 .to.emit(RPR, "Mint")
                 .withArgs(actorA.address, 10)
@@ -106,9 +94,14 @@ const BASE_URI = "ipfs-example/";
                     ).to.eq(actorA.address)
                 }
             })
+            it("should reject Actor B's underpriced 2 token mint during the seed round", async () => {
+                await expect (
+                    RPR.connect(actorB).seedRoundMint(2, {value: ethers.utils.parseEther("0.13")})
+                ).to.revertedWith("Insufficient funds")
+            })
             it("should accept Actor B's 2 token mint during the seed round", async () => {
-                expect (await
-                    RPR.connect(actorB).seedRoundMint(2, {value: ethers.utils.parseEther("0.07")})
+                await expect (
+                    RPR.connect(actorB).seedRoundMint(2, {value: ethers.utils.parseEther("0.14")})
                 )
                 .to.emit(RPR, "Mint")
                 .withArgs(actorB.address, 2)
@@ -121,46 +114,23 @@ const BASE_URI = "ipfs-example/";
             it("should reject seed round mints beyond allowance", async () => {
                 await expect (
                     RPR.connect(actorA).seedRoundMint(1, {value: ethers.utils.parseEther("0.07")})
-                ).to.revertedWith("Ineligible for seed round mint")
+                ).to.revertedWith("Attempting to mint more than allowed")
                 await expect (
                     RPR.connect(actorB).seedRoundMint(1, {value: ethers.utils.parseEther("0.07")})
-                ).to.revertedWith("Ineligible for seed round mint")
+                ).to.revertedWith("Attempting to mint more than allowed")
                 await expect (
                     RPR.connect(actorC).seedRoundMint(1, {value: ethers.utils.parseEther("0.07")})
-                ).to.revertedWith("Ineligible for seed round mint")
-            })
-            it("should reject presale mint attempts", async () => {
-                await expect (
-                    RPR.connect(actorA).preSaleMint(5, {value: ethers.utils.parseEther("4.0")})
-                ).to.revertedWith("Pre-sale not yet started")
-                await expect (
-                    RPR.connect(actorB).preSaleMint(5, {value: ethers.utils.parseEther("4.0")})
-                ).to.revertedWith("Pre-sale not yet started")
-                await expect (
-                    RPR.connect(actorC).preSaleMint(5, {value: ethers.utils.parseEther("4.0")})
-                ).to.revertedWith("Pre-sale not yet started")
-            })
-            it("should reject public sale mint attempts", async () => {
-                await expect (
-                    RPR.connect(actorA).publicSaleMint(5, {value: ethers.utils.parseEther("4.0")})
-                ).to.revertedWith("public sale has not begun yet")
-                await expect (
-                    RPR.connect(actorB).publicSaleMint(5, {value: ethers.utils.parseEther("4.0")})
-                ).to.revertedWith("public sale has not begun yet")
-                await expect (
-                    RPR.connect(actorC).publicSaleMint(5, {value: ethers.utils.parseEther("4.0")})
-                ).to.revertedWith("public sale has not begun yet")
+                ).to.revertedWith("Attempting to mint more than allowed")
             })
         })
 
         describe("Presale", async () => {
             it("Should revert presale mints until the presale timestamp: " + preSaleStartTime.toString(), async () => {
-                console.log(`\tRevert pre sale mints until presale start time`);
                 while ((await ethers.provider.getBlock('latest')).timestamp + 1 < preSaleStartTime) {
-                    await expect (
-                        RPR.preSaleMint(5, {value: ethers.utils.parseEther("4.0")})
-                    ).to.revertedWith("Pre-sale not yet started")
                     console.log(`\t\tReverted: \tstamp ${(await ethers.provider.getBlock('latest')).timestamp} < ${preSaleStartTime}`);
+                    await expect (
+                        RPR.mint(5, {value: ethers.utils.parseEther("4.0")})
+                    ).to.revertedWith("Sale not yet started")
                 }
             })
             it("should revert Actor C's attempt to mint more than the allowed amount in pre-sale", async () => {
@@ -168,7 +138,7 @@ const BASE_URI = "ipfs-example/";
                 const c_bal = await ethers.provider.getBalance(actorC.address);
                 const rpr_bal = await ethers.provider.getBalance(RPR.address);
                 await expect (
-                    RPR.connect(actorC).preSaleMint(20, {value: ethers.utils.parseEther("4.0")})
+                    RPR.connect(actorC).mint(20, {value: ethers.utils.parseEther("4.0")})
                 ).to.revertedWith("can not mint this many")
                 // Actor C should have no tokens from seed sale
                 expect (await RPR.balanceOf(actorC.address)).to.eq(0)
@@ -176,13 +146,13 @@ const BASE_URI = "ipfs-example/";
                 expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal)
             })
 
-            it("should accept Actor C's attempt to mint 5 tokens during the pre sale", async () => {
+            it("should accept Actor C's attempt to mint 10 tokens during the pre sale", async () => {
                 const c_bal = await ethers.provider.getBalance(actorC.address);
                 const rpr_bal = await ethers.provider.getBalance(RPR.address);
                 expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal.add(ethers.utils.parseEther("0.0")))
 
                 await expect (
-                    RPR.connect(actorC).preSaleMint(10, {value: ethers.utils.parseEther("8.0")})
+                    RPR.connect(actorC).mint(10, {value: ethers.utils.parseEther("8.0")})
                 ).to.emit(RPR, "Mint")
                 .withArgs(actorC.address, 10)
 
@@ -194,35 +164,22 @@ const BASE_URI = "ipfs-example/";
                 const c_bal = await ethers.provider.getBalance(actorC.address);
                 const rpr_bal = await ethers.provider.getBalance(RPR.address);
                 await expect (
-                    RPR.connect(actorC).preSaleMint(1, {value: ethers.utils.parseEther("4.0")})
+                    RPR.connect(actorC).mint(1, {value: ethers.utils.parseEther("4.0")})
                 ).to.revertedWith("can not mint this many")
                 // Actor C should have no tokens from seed sale
                 expect (await RPR.balanceOf(actorC.address)).to.eq(10)
                 expect ((await ethers.provider.getBalance(actorC.address)).lt(c_bal))
                 expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal)
             })
-            it("shoud revert Actor A's attempt to seed round mint", async () => {
-                await expect (
-                    RPR.connect(actorA).seedRoundMint(1, {value: ethers.utils.parseEther("1")})
-                ).to.revertedWith("seed round is over")
-            })
-            it("shoud revert Actor A's attempt to public sale mint", async () => {
-                await expect (
-                    RPR.connect(actorA).publicSaleMint(1)
-                ).to.revertedWith("public sale has not begun yet")
-            })
         })
         describe("Public Sale", async () => {
             const publicSaleStartTime = preSaleStartTime + 14400; // PreSaleTimestamp + uint256(4 hours)
             it("Should revert presale mints until the public sale timestamp: " + publicSaleStartTime.toString(), async () => {
-                console.log(`\tRevert public sale mints until public start time`);
                 await network.provider.send("evm_increaseTime", [14390]);
 
-                while ((await ethers.provider.getBlock('latest')).timestamp + 1 < publicSaleStartTime) {
-                    await expect (
-                        RPR.publicSaleMint(5, {value: ethers.utils.parseEther("5.0")})
-                    ).to.revertedWith("public sale has not begun yet")
-                    console.log(`\t\tReverted: \tstamp ${(await ethers.provider.getBlock('latest')).number} < ${publicSaleStartTime}`);
+                while ((await RPR.getPrice()).lt(publicSalePrice)) {
+                    await network.provider.send("evm_mine")
+                    console.log(`\t\tWaiting: \tstamp ${(await ethers.provider.getBlock('latest')).timestamp} < ${publicSaleStartTime} => price = ${(await RPR.getPrice()).toString()}`);
                 }
             })
 
@@ -231,7 +188,7 @@ const BASE_URI = "ipfs-example/";
                 const c_bal = await ethers.provider.getBalance(actorD.address);
                 const rpr_bal = await ethers.provider.getBalance(RPR.address);
                 await expect (
-                    RPR.connect(actorD).publicSaleMint(20, {value: ethers.utils.parseEther("20.0")})
+                    RPR.connect(actorD).mint(20, {value: ethers.utils.parseEther("20.0")})
                 ).to.revertedWith("can not mint this many")
                 // Actor C should have no tokens from seed sale
                 expect (await RPR.balanceOf(actorD.address)).to.eq(0)
@@ -245,7 +202,7 @@ const BASE_URI = "ipfs-example/";
                 expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal.add(ethers.utils.parseEther("0.0")))
 
                 await expect (
-                    RPR.connect(actorD).publicSaleMint(10, {value: ethers.utils.parseEther("10.0")})
+                    RPR.connect(actorD).mint(10, {value: ethers.utils.parseEther("10.0")})
                 ).to.emit(RPR, "Mint")
                 .withArgs(actorD.address, 10)
 
@@ -257,22 +214,17 @@ const BASE_URI = "ipfs-example/";
                 const c_bal = await ethers.provider.getBalance(actorD.address);
                 const rpr_bal = await ethers.provider.getBalance(RPR.address);
                 await expect (
-                    RPR.connect(actorD).publicSaleMint(1, {value: ethers.utils.parseEther("1.0")})
+                    RPR.connect(actorD).mint(1, {value: ethers.utils.parseEther("1.0")})
                 ).to.revertedWith("can not mint this many")
                 // Actor C should have no tokens from seed sale
                 expect (await RPR.balanceOf(actorD.address)).to.eq(10)
                 expect ((await ethers.provider.getBalance(actorD.address)).lt(c_bal))
                 expect (await ethers.provider.getBalance(RPR.address)).to.eq(rpr_bal)
             })
-            it("shoud revert Actor B's attempt to seed round mint", async () => {
+            it("should revert Actor B's attempt to seed round mint", async () => {
                 await expect (
                     RPR.connect(actorD).seedRoundMint(1) 
                 ).to.revertedWith("seed round is over")
-            })
-            it("shoud revert Actor B's attempt to pre sale mint", async () => {
-                await expect (
-                    RPR.connect(actorD).preSaleMint(1, {value: ethers.utils.parseEther("1")})
-                ).to.revertedWith("Pre-sale not yet started")
             })
         })
     })
@@ -284,7 +236,7 @@ const BASE_URI = "ipfs-example/";
 
             // Actions
             await expect (
-                RPR.connect(actorE).publicSaleMint(1, {value: ethers.utils.parseEther("0.05")})
+                RPR.connect(actorE).mint(1, {value: ethers.utils.parseEther("0.05")})
             ).to.revertedWith("Insufficient funds")
 
             expect(await RPR.balanceOf(actorE.address)).to.eq(0)
@@ -297,7 +249,7 @@ const BASE_URI = "ipfs-example/";
 
             // Actions
             await expect (
-                RPR.connect(actorE).publicSaleMint(1, {value: ethers.utils.parseEther("1.0")})
+                RPR.connect(actorE).mint(1, {value: ethers.utils.parseEther("1.0")})
             ).to.emit(RPR, "Transfer")
             .withArgs(ethers.constants.AddressZero, actorE.address, index)
 
@@ -313,7 +265,7 @@ const BASE_URI = "ipfs-example/";
             const index = await RPR.totalSupply();
             // Actions
             expect (await
-                RPR.connect(actorE).publicSaleMint(2, {value: ethers.utils.parseEther("3.0")})
+                RPR.connect(actorE).mint(2, {value: ethers.utils.parseEther("3.0")})
             )
             .to.emit(RPR, "Transfer")
             .withArgs(ethers.constants.AddressZero, actorE.address, index)
@@ -323,31 +275,30 @@ const BASE_URI = "ipfs-example/";
             expect(await RPR.ownerOf(index)).to.eq(actorE.address)
             expect(await RPR.ownerOf(index.add(1))).to.eq(actorE.address)
             expect(await RPR.balanceOf(actorE.address)).to.eq(rpr_bal.add(2))
-            expect((await actorE.getBalance()).lt(pre_bal.sub(ethers.utils.parseEther("2.0"))))
-            expect((await actorE.getBalance()).gt(pre_bal.sub(ethers.utils.parseEther("2.9"))))
-            expect((await ethers.provider.getBalance(RPR.address)).sub(pre_con_bal)).to.eq(ethers.utils.parseEther("2.0"))
+            expect((await actorE.getBalance()).lt(pre_bal.sub(ethers.utils.parseEther("3.0"))))
+            expect((await actorE.getBalance()).gt(pre_bal.sub(ethers.utils.parseEther("3.1"))))
+            expect((await ethers.provider.getBalance(RPR.address)).sub(pre_con_bal)).to.eq(ethers.utils.parseEther("3.0"))
         })
         it("Burn 1 NFT", async () => {
             // Pre conditions
-            console.log(`\tActor A Address: ${actorA.address}`);
-            await RPR.connect(owner).mint(actorA.address, 1)
-            console.log(`\tActor A Pre balance: ${await RPR.balanceOf(actorA.address)}`);
+            console.log(`\tActor A Address: ${actorE.address}`);
+            let index = await RPR.totalSupply();
+            await RPR.connect(actorE).mint(1, {value: ethers.utils.parseEther("1.0")});
+            console.log(`\tActor A Pre balance: ${await RPR.balanceOf(actorE.address)}`);
 
             //I was wrong about the burn() method. You can just test burning it by sending it to the zero-address.
 
             // Actions
             await expect (
-                RPR.connect(actorB).burn(0)
-            )
-            .to.be.reverted
+                RPR.connect(actorB).burn(index)
+            ).to.be.reverted
 
             await expect (
-                RPR.connect(actorA).burn(0)
-            )
-            .to.emit(RPR, "Transfer")
+                RPR.connect(actorE).burn(index)
+            ).to.emit(RPR, "Transfer")
             
             // What you expect it to look like afterwards
-            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
+            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorE.address)}`);
             
             //Add Assertions about balances
         })
@@ -357,15 +308,15 @@ const BASE_URI = "ipfs-example/";
         it("should transfer a single NFT", async () => {
             // Pre conditions
             index = await RPR.totalSupply();
-            await RPR.connect(owner).mint(actorA.address, 1)
+            await RPR.connect(actorE).mint(1, {value: ethers.utils.parseEther("1.0")});
 
             // Actions
             await expect (
-                RPR.connect(actorB).transfer(actorA.address, actorB.address, index)
+                RPR.connect(actorB)["safeTransferFrom(address,address,uint256)"](actorE.address, actorB.address, index)
             ).to.be.reverted;
 
             await expect(
-                RPR.connect(actorA).transfer(actorA.address, actorB.address, index)
+                RPR.connect(actorE)["safeTransferFrom(address,address,uint256)"](actorE.address, actorB.address, index)
             ).to.emit(RPR, "Transfer")
 
             expect(await
@@ -373,7 +324,7 @@ const BASE_URI = "ipfs-example/";
             ).to.eq(actorB.address)
 
             // What you expect it to look like afterwards
-            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorA.address)}`);
+            console.log(`\tActor A Post balance: ${await RPR.balanceOf(actorE.address)}`);
             console.log(`\tActor B Post balance: ${await RPR.balanceOf(actorB.address)}`);
         })
 
@@ -383,14 +334,14 @@ const BASE_URI = "ipfs-example/";
             
             // Actions
             await expect(
-                RPR.connect(actorC).transfer(actorB.address, actorC.address, index)
+                RPR.connect(actorC)["safeTransferFrom(address,address,uint256)"](actorB.address, actorC.address, index)
             )
             .to.be.reverted
 
             RPR.connect(actorB).approve(actorA.address, index)
 
             expect(await
-                RPR.connect(actorA).transfer(actorB.address, actorA.address, index)
+                RPR.connect(actorA)["safeTransferFrom(address,address,uint256)"](actorB.address, actorA.address, index)
             )
             .to.emit(RPR, "Transfer")
 
@@ -423,16 +374,16 @@ const BASE_URI = "ipfs-example/";
 
             // Actions
             await expect (
-                RPR.connect(owner).mint(actorC.address, 1)
+                RPR.connect(actorF).mint(1, {value: ethers.utils.parseEther("1.0")})
             )
             .to.emit(RPR, "Mint")
             .to.emit(RPR, "Transfer")
 
             // What you expect it to look like afterwards
-            console.log(`\tActor C Address: \t${actorC.address}`);
+            console.log(`\tActor C Address: \t${actorF.address}`);
             console.log(`\tOwner of id ${tokenId}: \t\t${await RPR.ownerOf(tokenId)}`);
             expect(
-                await RPR.ownerOf(tokenId) == actorC.address
+                await RPR.ownerOf(tokenId) == actorF.address
             )
 
             smartWalletAddress = await RPR.callStatic.getWalletAddressForTokenId(tokenId);
@@ -442,7 +393,7 @@ const BASE_URI = "ipfs-example/";
         describe("Ether mechanics" ,async () => {
             it("Pre conditions ^", async () => {
                 console.log(`\tSmart Wallet Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
-                console.log(`\tActor C ETH balance: \t\t${await actorC.getBalance()}`);
+                console.log(`\tActor C ETH balance: \t\t${await actorF.getBalance()}`);
             })
             it("should deposit 15 ether into smart wallet", async () => {
                 await actorA.sendTransaction({value: ethers.utils.parseEther("15"), to: smartWalletAddress});
@@ -462,13 +413,13 @@ const BASE_URI = "ipfs-example/";
             })
             it("should accept actor C's attempt to withdraw from smart wallet", async () => {
                 const bal = await ethers.provider.getBalance(smartWalletAddress);
-                (await RPR.connect(actorC).withdrawEther(tokenId)).wait()
+                (await RPR.connect(actorF).withdrawEther(tokenId)).wait()
                 expect(await ethers.provider.getBalance(smartWalletAddress)).to.eq(ethers.utils.parseEther("0"));
-                expect(await ethers.provider.getBalance(actorC.address)).to.above(bal);
+                expect(await ethers.provider.getBalance(actorF.address)).to.above(bal);
             })
             it("Post Conditions ^", async () => {
                 console.log(`\tSmart Wallet Post Eth Balance: \t${await ethers.provider.getBalance(smartWalletAddress)}`);
-                console.log(`\tActor C Post Eth Balance: \t${await ethers.provider.getBalance(actorC.address)}`);
+                console.log(`\tActor C Post Eth Balance: \t${await ethers.provider.getBalance(actorF.address)}`);
             })
         })
         describe("ERC20 Basic Mechanics", async () => {
@@ -478,7 +429,7 @@ const BASE_URI = "ipfs-example/";
             })
             it("Pre Conditions", async () => {
                 console.log(`\tMock20 balance (smart wallet): \t${await Mock20.balanceOf(smartWalletAddress)}`);
-                console.log(`\tMock20 balance (actor C): \t${await Mock20.balanceOf(actorC.address)}`);
+                console.log(`\tMock20 balance (actor C): \t${await Mock20.balanceOf(actorF.address)}`);
                 console.log(`\tETH balance (smart wallet): \t${await ethers.provider.getBalance(smartWalletAddress)}`);
                 console.log(`\tETH balance (actor C): \t\t${await ethers.provider.getBalance(actorB.address)}`);
             })
@@ -511,16 +462,16 @@ const BASE_URI = "ipfs-example/";
             })
             it("should correctly withdraw 1000 tokens + all eth from actor C", async () => {
                 await expect (
-                    RPR.connect(actorC).withdrawERC20(Mock20.address, 1000, tokenId)
+                    RPR.connect(actorF).withdrawERC20(Mock20.address, 1000, tokenId)
                 ).to.emit(Mock20, "Transfer")
                 expect((await Mock20.balanceOf(smartWalletAddress)).eq(1000))
-                expect((await Mock20.balanceOf(actorC.address)).eq(1000))
+                expect((await Mock20.balanceOf(actorF.address)).eq(1000))
             })
             it("Post conditions ^", async () => {
                 console.log(`\tMock20 balance (smart wallet): \t${await Mock20.balanceOf(smartWalletAddress)}`);
-                console.log(`\tMock20 balance (actor C): \t${await Mock20.balanceOf(actorC.address)}`);
+                console.log(`\tMock20 balance (actor C): \t${await Mock20.balanceOf(actorF.address)}`);
                 console.log(`\tEth balance (smart wallet): \t${await ethers.provider.getBalance(smartWalletAddress)}`);
-                console.log(`\tEth balance (actor C): \t\t${await ethers.provider.getBalance(actorC.address)}`);
+                console.log(`\tEth balance (actor C): \t\t${await ethers.provider.getBalance(actorF.address)}`);
             })
         })
         describe("ERC721 Basic Mechanics", async () => {
@@ -550,13 +501,13 @@ const BASE_URI = "ipfs-example/";
             })
             it("should accept Actor C's attempt to access smart wallet", async () => {
                 await expect(
-                    RPR.connect(actorC).withdrawERC721(Mock721.address, 0, tokenId)
+                    RPR.connect(actorF).withdrawERC721(Mock721.address, 0, tokenId)
                 ).to.emit(Mock721, "Transfer")
-                .withArgs(smartWalletAddress, actorC.address, 0);
-                expect(await Mock721.ownerOf(0)).eq(actorC.address)
+                .withArgs(smartWalletAddress, actorF.address, 0);
+                expect(await Mock721.ownerOf(0)).eq(actorF.address)
             })
             it("Post conditions", async () => {
-                console.log(`\tActor C address: \t${actorC.address}`);
+                console.log(`\tActor C address: \t${actorF.address}`);
                 console.log(`\tOwner of Mock721(0): \t${await Mock721.ownerOf(0)}`);
             })
         })
@@ -569,12 +520,12 @@ const BASE_URI = "ipfs-example/";
                 id1 = await RPR.callStatic.totalSupply();
                 id2 = id1.add(1);
                 await expect(
-                    RPR.connect(owner).mint(actorA.address, 1)
+                    RPR.connect(actorF).mint(1, {value: ethers.utils.parseEther("1")})
                 ).to.emit(RPR, "Mint")
                 await expect(
-                    RPR.connect(owner).mint(actorB.address, 1)
+                    RPR.connect(actorB).mint(1, {value: ethers.utils.parseEther("1")})
                 ).to.emit(RPR, "Mint")
-                expect (await RPR.ownerOf(id1)).to.eq(actorA.address);
+                expect (await RPR.ownerOf(id1)).to.eq(actorF.address);
                 expect (await RPR.ownerOf(id2)).to.eq(actorB.address);
                 id1_address = await RPR.callStatic.getWalletAddressForTokenId(id1);
                 id2_address = await RPR.callStatic.getWalletAddressForTokenId(id2);
@@ -595,26 +546,26 @@ const BASE_URI = "ipfs-example/";
             })
             it("Initial Conditions", async () => {
                 console.log(`\tMock20 balance \t${await Mock20.balanceOf(id1_address)} held in smart wallet: \t${id1_address}`);
-                console.log(`\tOwner of ${id1_address}: \t${actorA.address}`);
+                console.log(`\tOwner of ${id1_address}: \t${actorF.address}`);
 
                 console.log(`\tMock721 balance \t${await Mock721.balanceOf(id2_address)} held in smart wallet: \t${id2_address}`);
                 console.log(`\tOwner of ${id2_address}: \t${actorB.address}`);
             })
             it("should trade id1 and id2 between actors A and B", async () => {
                 await expect (
-                    RPR.connect(actorA).transferFrom(actorA.address, actorB.address, id1)
+                    RPR.connect(actorF).transferFrom(actorF.address, actorB.address, id1)
                 ).to.emit(RPR, "Transfer")
-                .withArgs(actorA.address, actorB.address, id1);
+                .withArgs(actorF.address, actorB.address, id1);
                 expect ( await RPR.ownerOf(id1) ).to.eq(actorB.address);
                 await expect (
-                    RPR.connect(actorB).transferFrom(actorB.address, actorA.address, id2)
+                    RPR.connect(actorB).transferFrom(actorB.address, actorF.address, id2)
                 ).to.emit(RPR, "Transfer")
-                .withArgs(actorB.address, actorA.address, id2);
-                expect ( await RPR.ownerOf(id2) ).to.eq(actorA.address);
+                .withArgs(actorB.address, actorF.address, id2);
+                expect ( await RPR.ownerOf(id2) ).to.eq(actorF.address);
             })
             it("should revert Actor A's attempt to access id1", async () => {
                 await expect(
-                    RPR.connect(actorA).withdrawERC20(Mock20.address, 500, id1)
+                    RPR.connect(actorF).withdrawERC20(Mock20.address, 500, id1)
                 ).to.revertedWith("Only the token owner can withdraw ERC20");
                 expect ( await Mock20.balanceOf(id1_address) ).to.eq(500);
             })            
@@ -626,10 +577,10 @@ const BASE_URI = "ipfs-example/";
             })
             it("should accept Actor A's attempt to correctly access id2", async () => {
                 await expect(
-                    RPR.connect(actorA).withdrawERC721(Mock721.address, 1, id2)
+                    RPR.connect(actorF).withdrawERC721(Mock721.address, 1, id2)
                 ).to.emit(Mock721, "Transfer")
-                .withArgs(id2_address, actorA.address, 1);
-                expect ( await Mock721.ownerOf(1) ).to.eq(actorA.address);
+                .withArgs(id2_address, actorF.address, 1);
+                expect ( await Mock721.ownerOf(1) ).to.eq(actorF.address);
             })
             it("should accept Actor B's attempt to correctly access id1", async () => {
                 await expect(
@@ -642,40 +593,6 @@ const BASE_URI = "ipfs-example/";
                 console.log(`\tOwner of Mock721: \t${await Mock721.ownerOf(1)}`);
                 console.log(`\t${actorB.address} Mock20 balance: \t${await Mock20.balanceOf(actorB.address)}`);
             })
-        })
-
-
-    })
-    describe("Malicious behavior prevention", async () => {
-        it("Should Revert on mint > 5 NFTs", async () => {
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 6)
-            ).to.revertedWith("RPR: mint limit exceeded")
-        })
-
-        it("Should revert on pay below floor price", async () => {
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 1)
-            ).to.revertedWith("RPR: insufficient funds")
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 1, { value: ethers.utils.parseEther("0.01") })
-            ).to.revertedWith("RPR: insufficient funds")
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 2, { value: ethers.utils.parseEther("1.999999999") })
-            ).to.revertedWith("RPR: insufficient funds")
-        })
-        it("Should revert on exceeded mint capacity for address", async () => {
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 1)
-            ).to.revertedWith("RPR: insufficient funds")
-
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 1, { value: ethers.utils.parseEther("0.01") })
-            ).to.revertedWith("RPR: insufficient funds")
-
-            expect (await
-                RPR.connect(actorA).payable_mint(actorA.address, 2, { value: ethers.utils.parseEther("1.999999999") })
-            ).to.revertedWith("RPR: insufficient funds")
         })
     })
     describe("Withdrawing charity funds", async () => {
@@ -706,7 +623,7 @@ const BASE_URI = "ipfs-example/";
     }
 
     async function main() {
-        [owner, actorA, actorB, actorC] = await ethers.getSigners();
+        [owner, actorA] = await ethers.getSigners();
         RPR_Factory = await ethers.getContractFactory("RektPepeRenaissance") as RektPepeRenaissance__factory
         const maxBatchSize = 10;
         const collectionSize = 10000;

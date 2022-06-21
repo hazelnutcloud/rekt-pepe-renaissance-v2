@@ -20,6 +20,10 @@ const config = {
                 url: "https://eth-mainnet.alchemyapi.io/v2/zOVFUzSEld1v_MuTOqGPYkTYttwBUrmF",
                 blockNumber: 14800000,
             },
+            mining: {
+                auto: true,
+                interval: [300, 600]
+              }
         }
     },
     //     rinkeby: {
