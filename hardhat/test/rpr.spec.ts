@@ -97,7 +97,7 @@ const BASE_URI = "ipfs-example/";
             it("should reject Actor B's underpriced 2 token mint during the seed round", async () => {
                 await expect (
                     RPR.connect(actorB).seedRoundMint(2, {value: ethers.utils.parseEther("0.13")})
-                ).to.revertedWith("Insufficient funds")
+                ).to.revertedWith("Incorrect funds")
             })
             it("should accept Actor B's 2 token mint during the seed round", async () => {
                 await expect (
@@ -237,7 +237,7 @@ const BASE_URI = "ipfs-example/";
             // Actions
             await expect (
                 RPR.connect(actorE).mint(1, {value: ethers.utils.parseEther("0.05")})
-            ).to.revertedWith("Insufficient funds")
+            ).to.revertedWith("Incorrect funds")
 
             expect(await RPR.balanceOf(actorE.address)).to.eq(0)
 
@@ -257,27 +257,11 @@ const BASE_URI = "ipfs-example/";
             expect((await RPR.balanceOf(actorE.address)).eq(1))
             expect((await ethers.provider.getBalance(actorE.address)).lt(pre_bal.sub(ethers.utils.parseEther("1.0"))))
         })
-        it("should accept Actor E attempting to mint 2 NFTs overflow price", async () => {
-            // Pre conditions
-            const rpr_bal = await RPR.balanceOf(actorE.address);
-            const pre_bal = await ethers.provider.getBalance(actorE.address);
-            const pre_con_bal = await ethers.provider.getBalance(RPR.address);
-            const index = await RPR.totalSupply();
+        it("should reject Actor E attempting to mint 2 NFTs overflow price", async () => {
             // Actions
-            expect (await
+            await expect(
                 RPR.connect(actorE).mint(2, {value: ethers.utils.parseEther("3.0")})
-            )
-            .to.emit(RPR, "Transfer")
-            .withArgs(ethers.constants.AddressZero, actorE.address, index)
-            .to.emit(RPR, "Transfer")
-            .withArgs(ethers.constants.AddressZero, actorE.address, index.add(1))
-          
-            expect(await RPR.ownerOf(index)).to.eq(actorE.address)
-            expect(await RPR.ownerOf(index.add(1))).to.eq(actorE.address)
-            expect(await RPR.balanceOf(actorE.address)).to.eq(rpr_bal.add(2))
-            expect((await actorE.getBalance()).lt(pre_bal.sub(ethers.utils.parseEther("3.0"))))
-            expect((await actorE.getBalance()).gt(pre_bal.sub(ethers.utils.parseEther("3.1"))))
-            expect((await ethers.provider.getBalance(RPR.address)).sub(pre_con_bal)).to.eq(ethers.utils.parseEther("3.0"))
+            ).to.revertedWith("Incorrect funds")
         })
         it("Burn 1 NFT", async () => {
             // Pre conditions

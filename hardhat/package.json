@@ -118,6 +118,7 @@
     "glob-parent": "^5.1.2",
     "graceful-fs": "^4.2.8",
     "growl": "^1.10.5",
+    "hardhat-contract-sizer": "^2.5.1",
     "hardhat-gas-reporter": "^1.0.8",
     "has": "^1.0.3",
     "has-bigints": "^1.0.1",

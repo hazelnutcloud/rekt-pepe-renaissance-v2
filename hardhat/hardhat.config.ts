@@ -1,4 +1,6 @@
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-etherscan"
+import "hardhat-contract-sizer";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter"
 
@@ -6,11 +8,11 @@ import "hardhat-gas-reporter"
 const config = {
     defaultNetwork: "hardhat",
     gasReporter: {
-        enabled: false,
+        enabled: true,
         currency: "USD",
         src: "./contracts",
         gasPrice: 50,
-        ethPrice: 1800.16 
+        ethPrice: 1100.16 
     },
     networks: {
         hardhat: {
@@ -24,49 +26,48 @@ const config = {
                 auto: true,
                 interval: [300, 600]
               }
-        }
+        },
+        // rinkeby: {
+        //     url: "https://eth-rinkeby.alchemyapi.io/v2/srVBZIhy3PWWN1URQfd-KlTJk8q964kr",
+        //     accounts: [
+        //         "d52502401f0fe8d3a73cce950102a28ed2f1ed69b87448530a23129e5fbcbd41",
+        //     ],
+        // },
+        // mainnet: {
+        //     url: "https://eth-mainnet.alchemyapi.io/v2/zOVFUzSEld1v_MuTOqGPYkTYttwBUrmF",
+        //     accounts: [PRIVATE_KEY],
+        //     gasPrice: 50e9,
+        //     blockGasLimit: 12487794,
+        // },
+        // matic: {
+        //     url: "https://polygon-mainnet.g.alchemy.com/v2/XZF2U-6qLByJKH9OVsB8rflwSYaZRQaq",
+        //     accounts: [PRIVATE_KEY],
+        //     gasPrice: 40e9,
+        //     chainId: 137,
+        //     blockGasLimit: 12487794,
+        // },
+        // fantom: {
+        //     url: "https://rpc.ftm.tools/",
+        //     accounts: [PRIVATE_KEY],
+        //     gasPrice: 100e9,
+        //     chainId: 250,
+        //     blockGasLimit: 12487794,
+        // },
+        // avax: {
+        //     url: "https://api.avax.network/ext/bc/C/rpc",
+        //     accounts: [PRIVATE_KEY],
+        //     gasPrice: 75e9,
+        //     chainId: 43114,
+        //     blockGasLimit: 12487794,
+        // },
+        // syscoin: {
+        //     hardfork: "london",
+        //     url: "https://rpc.syscoin.org",
+        //     accounts: [PRIVATE_KEY],
+        //     gasPrice: "auto",
+        //     chainId: 57,
+        // },
     },
-    //     rinkeby: {
-    //         url: "https://eth-rinkeby.alchemyapi.io/v2/srVBZIhy3PWWN1URQfd-KlTJk8q964kr",
-    //         accounts: [
-    //             "d52502401f0fe8d3a73cce950102a28ed2f1ed69b87448530a23129e5fbcbd41",
-    //         ],
-    //     },
-    //     mainnet: {
-    //         url: "https://eth-mainnet.alchemyapi.io/v2/zOVFUzSEld1v_MuTOqGPYkTYttwBUrmF",
-    //         accounts: [PRIVATE_KEY],
-    //         gasPrice: 50e9,
-    //         blockGasLimit: 12487794,
-    //     },
-    //     matic: {
-    //         url: "https://polygon-mainnet.g.alchemy.com/v2/XZF2U-6qLByJKH9OVsB8rflwSYaZRQaq",
-    //         accounts: [PRIVATE_KEY],
-    //         gasPrice: 40e9,
-    //         chainId: 137,
-    //         blockGasLimit: 12487794,
-    //     },
-    //     fantom: {
-    //         url: "https://rpc.ftm.tools/",
-    //         accounts: [PRIVATE_KEY],
-    //         gasPrice: 100e9,
-    //         chainId: 250,
-    //         blockGasLimit: 12487794,
-    //     },
-    //     avax: {
-    //         url: "https://api.avax.network/ext/bc/C/rpc",
-    //         accounts: [PRIVATE_KEY],
-    //         gasPrice: 75e9,
-    //         chainId: 43114,
-    //         blockGasLimit: 12487794,
-    //     },
-    //     syscoin: {
-    //         hardfork: "london",
-    //         url: "https://rpc.syscoin.org",
-    //         accounts: [PRIVATE_KEY],
-    //         gasPrice: "auto",
-    //         chainId: 57,
-    //     },
-    // },
     paths: {
         artifacts: "./artifacts",
         cache: "./cache",

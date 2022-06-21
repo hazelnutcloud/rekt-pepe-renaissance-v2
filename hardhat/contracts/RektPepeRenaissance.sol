@@ -15,7 +15,6 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
     uint256 public immutable amountForAuctionAndDev;
     uint256 public immutable maxPerAddressDuringMint;
     uint256 public immutable seedRoundCap;
-    // TODO: Hardcoding this value? 
     uint256 public immutable preSaleDuration = 4 hours;
     address public immutable smartWalletTemplate;
     struct SaleConfig {
@@ -82,15 +81,10 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
         require(quantity > 0, "Cannot mint 0 tokens");
         require(allowlist[msg.sender] >= quantity, "Attempting to mint more than allowed");
         require(totalSupply() + quantity <= seedRoundCap, "reached max supply");
-        require(msg.value >= price * quantity, "Insufficient funds");
-        // Might be able to do this unchecked
-        unchecked {
-            allowlist[msg.sender] -= quantity;
-        }
-        _safeMint(msg.sender, quantity);
+        require(msg.value == price * quantity, "Incorrect funds");
 
-        //Do you want to offer a refund?
-        //refundIfOver(quantity * price);
+        allowlist[msg.sender] -= quantity;
+        _safeMint(msg.sender, quantity);
 
         emit Mint(msg.sender, quantity);
     }
@@ -107,19 +101,10 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
             _numberMinted(msg.sender) + quantity <= maxPerAddressDuringMint,
             "can not mint this many"
         );
-        require(msg.value >= price, "Insufficient funds");
+        require(msg.value == price * quantity, "Incorrect funds");
         _safeMint(msg.sender, quantity);
 
-        // Do you want to offer a refund?
-        // refundIfOver(price * quantity);
         emit Mint(msg.sender, quantity);
-    }
-
-    // TODO: Might remove
-    function refundIfOver(uint256 price) private {
-        if (msg.value > price) {
-            payable(msg.sender).transfer(msg.value - price);
-        }
     }
 
     function setSaleConfig(
@@ -197,16 +182,6 @@ contract RektPepeRenaissance is ERC721A, Ownable, ReentrancyGuard {
 
     function getWalletAddressForTokenId(uint256 tokenId) public returns (address walletAddress) {
         walletAddress = Clones.cloneDeterministic(smartWalletTemplate, keccak256(abi.encode(tokenId)));
-    }
-    // Should only the wallets owner be able to deposit ether into it? Technically anyone can figure out the address
-    // and just send ether to it? Is this method even needed? Are any of these methods actually needed? Is it 
-    // enough to just provide the address of the smart wallet and let the user do as they will?
-    function depositERC20(address _contract, uint256 amount, uint256 walletId) external callerIsUser {
-        IERC20(_contract).transferFrom(_msgSender(), getWalletAddressForTokenId(walletId), amount);
-    }
-
-    function depositERC721(address _contract, uint256 tokenId, uint256 walletId) external callerIsUser {
-        IERC721(_contract).safeTransferFrom(_msgSender(), getWalletAddressForTokenId(walletId), tokenId);
     }
 
     function withdrawEther(uint256 walletId) external callerIsUser {
