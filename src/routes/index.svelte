@@ -15,12 +15,14 @@
 					rekt pepe
 				</h1>
 				<h1 class="font-serif md:text-9xl sm:text-7xl text-5xl text-yellow-800">RenaissancE</h1>
-				<a href="https://blocks.io" target="_blank">
-					<div class="flex items-center gap-4 text-sm lg:text-base">
-						<p class="text-center">Verified by <span class="font-bold lg:text-xl">BLOCKS</span></p>
-						<img src="logos/blocks.png" alt="BLOCKS" class="w-14" />
-					</div>
-				</a>
+				<div class="divider">
+					<a href="https://blocks.io" target="_blank">
+						<div class="flex items-center gap-4 text-sm lg:text-base">
+							<p class="text-center">Verified by <span class="font-bold lg:text-xl">BLOCKS</span></p>
+							<img src="logos/blocks.png" alt="BLOCKS" class="w-14 mr-12" />
+						</div>
+					</a>
+				</div>
 			</div>
 			<Carousel />
 		</div>
