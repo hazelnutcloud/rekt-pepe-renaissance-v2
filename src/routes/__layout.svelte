@@ -1,89 +1,75 @@
 <script>
-	import Header from "$lib/components/header/Header.svelte";
-	import Annoucements from "$lib/components/Icons/Announcements.svelte";
-	import Discord from "$lib/components/Icons/Discord.svelte";
-	import Telegram from "$lib/components/Icons/Telegram.svelte";
-	import Twitter from "$lib/components/Icons/Twitter.svelte";
-	import { SvelteToast } from "@zerodevx/svelte-toast";
-	import "../styles/main.scss";
+	import ConnectWallet from '$lib/components/ConnectWallet.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import ThemePicker from '$lib/components/ThemePicker.svelte';
+	import { onMount } from 'svelte';
+	// @ts-ignore
+	import { themeChange } from 'theme-change';
+	import '../app.css';
+
+	onMount(() => {
+		themeChange(false);
+	});
 </script>
 
-<Header />
-
-<main>
-  <slot />
-</main>
-
-<footer class="footer">
-  <div class="socials">
-    <a
-      class="icon-wrapper"
-      data-delay="0"
-      href="https://twitter.com/RektRenaissance"
-      target="_blank"
-    >
-      <Twitter />
-    </a>
-    <a
-      class="icon-wrapper"
-      data-delay="500"
-      href="https://discord.gg/rektpeperenaissance"
-      target="_blank"
-    >
-      <Discord />
-    </a>
-  </div>
-  <p class="copyright" data-delay="400">
-    {`Rekt Pepe Renaissance ${new Date().getFullYear()} ©. All Rights Reserved.`}
-  </p>
-</footer>
-
-<SvelteToast />
-
-<style lang="scss">
-  .icon-wrapper {
-    display: flex;
-    align-items: center;
-    opacity: 0.5;
-
-    &:hover {
-      opacity: 1;
-    }
-
-    :global(svg) {
-      height: var(--font-size--3);
-      width: var(--font-size--3);
-    }
-  }
-
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--page-wrapper-padding);
-    width: 100%;
-    gap: 3rem;
-    margin: 0 auto;
-    align-items: center;
-    justify-content: space-evenly;
-  }
-
-  .socials {
-    display: flex;
-    gap: 2rem;
-  }
-
-  footer {
-    display: grid;
-    place-items: center;
-    padding: var(--page-wrapper-padding);
-    gap: 2rem;
-    z-index: 1;
-  }
-
-  .copyright {
-    font-family: var(--font-family--base);
-    color: var(--color--lightgray);
-    font-size: var(--font-size---2);
-  }
-</style>
+<!-- https://daisyui.com/components/drawer/ -->
+<div class="drawer">
+	<input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+	<div class="drawer-content flex flex-col">
+		<!-- Navbar -->
+		<div class="w-full navbar bg-base-200 top-0 left-0 justify-between z-50 sticky">
+			<div class="flex-none lg:hidden">
+				<label for="my-drawer-3" class="btn btn-square btn-ghost">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						class="inline-block w-6 h-6 stroke-current"
+						><path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 6h16M4 12h16M4 18h16"
+						/></svg
+					>
+				</label>
+			</div>
+			<a href="/">
+				<div
+					class="text-3xl hover:bg-base-300 p-2 rounded-lg hover:shadow-lg hidden lg:block font-serif tracking-wide"
+				>
+					RPR
+				</div></a
+			>
+			<div class="flex gap-4">
+				<ThemePicker />
+				<ul class="menu menu-horizontal menu-compact gap-1 hidden lg:flex">
+					<!-- Navbar menu content here -->
+					<li class="py-0">
+						<a class="text-xl" href="/mint">Mint</a>
+					</li>
+					<li class="py-0">
+						<a class="text-xl" href="/roadmap">Roadmap</a>
+					</li>
+					<li class="py-0">
+						<a class="text-xl" href="/about">About</a>
+					</li>
+				</ul>
+				<ConnectWallet />
+			</div>
+		</div>
+		<!-- Page content here -->
+		<slot />
+		<Footer />
+	</div>
+	<div class="drawer-side">
+		<label for="my-drawer-3" class="drawer-overlay" />
+		<ul class="menu p-4 overflow-y-auto w-80 bg-base-100">
+			<!-- Sidebar content here -->
+			<li><a class="text-xl" href="/">Home</a></li>
+			<li><a class="text-xl" href="/mint">Mint</a></li>
+			<li><a class="text-xl" href="/roadmap">Roadmap</a></li>
+			<li><a class="text-xl" href="/about">About</a></li>
+		</ul>
+	</div>
+</div>

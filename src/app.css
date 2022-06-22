@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400&display=swap');@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "sernes";
+    src: url("/fonts/sernes.otf");
+}
+
+@font-face {
+    font-family: "kiona";
+    src: url("/fonts/kiona.ttf");
+}

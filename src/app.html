@@ -2,36 +2,12 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="description" content="Home of the Rekt Renaissance" />
-		<meta property="og:image" content="/images/logo.jpg"/>
-		<meta name="twitter:card" content="/images/logo.jpg">
-		<meta name="twitter:image:alt" content="We're all rekt in here">
-		<meta property="og:site_name" content="Rekt Pepe Renaissance">
-
-		<!-- Material Icons -->
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/icon?family=Material+Icons"
-	  	/>
-		<!-- SMUI Styles -->
-		<link rel="stylesheet" href="/smui.css" media="(prefers-color-scheme: light)" />
-		<link
-			rel="stylesheet"
-			href="/smui-dark.css"
-			media="screen and (prefers-color-scheme: dark)"
-		/>
-		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-		<link rel="manifest" href="/site.webmanifest">
-		<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#ffa600">
-		<meta name="msapplication-TileColor" content="#ffa600">
-		<meta name="theme-color" content="#ffa600">
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		%svelte.head%
+		<title>Rekt Pepe Renaissance</title>
+		%sveltekit.head%
 	</head>
 	<body>
-		<div id="svelte">%svelte.body%</div>
-		<aside id="portal"/>
+		<div>%sveltekit.body%</div>
 	</body>
 </html>
