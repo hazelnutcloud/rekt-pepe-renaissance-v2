@@ -8,7 +8,7 @@
 	class="flex h-screen overflow-y-auto justify-center items-center p-10 bg-[url('/frog.jpg')] bg-base-100 bg-blend-overlay"
 	in:blur
 >
-	<div class="flex flex-col items-center gap-8">
+	<div class="flex flex-col items-center gap-14">
 		<div class="flex flex-col lg:flex-row gap-10 lg:gap-20 items-center">
 			<div class="flex flex-col items-center gap-4 min-h-full">
 				<h1 class="font-sans md:text-3xl text-2xl text-yellow-700 font-black">

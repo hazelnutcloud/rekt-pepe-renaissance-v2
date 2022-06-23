@@ -14,6 +14,14 @@
 	import Web3Modal from 'web3modal';
 	import CoinBaseWalletSDK from '@coinbase/wallet-sdk'
 	import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js'
+	import * as UAuthWeb3Modal from '@uauth/web3modal';
+	import UAuthSPA from '@uauth/js'
+
+	const uauthOptions: UAuthWeb3Modal.IUAuthOptions = {
+		clientID: "40ffd3bd-8fa8-4759-af3d-173f482b61d4",
+		redirectUri: "http://localhost:3000",
+		scope: "openid wallet"
+	}
 
 	const providerOptions = {
 		coinbasewallet: {
@@ -28,6 +36,12 @@
 			options: {
 				infuraId: "d704cdd9955f4fae94b5b600f39a183c",
 			}
+		},
+		'custom-uauth': {
+			display: UAuthWeb3Modal.display,
+			connector: UAuthWeb3Modal.connector,
+			package: UAuthSPA,
+			options: uauthOptions
 		}
 	};
 
@@ -63,6 +77,10 @@
 		web3modalInstance = await web3modal!.connect();
 		$provider = new ethers.providers.Web3Provider(web3modalInstance);
 		$accounts = await $provider!.listAccounts();
+		const udomain = (await new UAuthSPA(uauthOptions).user());
+		if (udomain) {
+			udomainName = udomain.sub;
+		}
 		initEthers();
 	};
 
@@ -104,6 +122,7 @@
 				},
 				providerOptions
 			});
+			UAuthWeb3Modal.registerWeb3Modal(web3modal)
 		}
 	};
 
@@ -113,6 +132,9 @@
 		if (!web3modal!.cachedProvider) return;
 		initWallet();
 	});
+
+	let udomainName: string | undefined;
+	$: displayAddress = udomainName ? udomainName : truncateAddress($accounts[0]);
 </script>
 
 {#if wrongChain}
@@ -129,7 +151,7 @@
 	<div class="dropdown dropdown-end">
 		<label for="" tabindex="0" class="text-base-content btn text-lg bg-base-300"
 			><Fa icon={faWallet} class="md:pr-4" scale={1.2} /><span class="hidden md:inline"
-				>{truncateAddress($accounts[0])}</span
+				>{displayAddress}</span
 			></label
 		>
 		<ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">

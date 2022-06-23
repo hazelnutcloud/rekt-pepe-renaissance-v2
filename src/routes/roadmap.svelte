@@ -10,31 +10,38 @@
 	let roadMaps = [
 		{
 			desc: 'lorem',
-			title: 'roadmap 1'
+			title: 'roadmap 1',
+			revealed: true
 		},
 		{
 			desc: 'ipsum',
-			title: 'roadmap 2'
+			title: 'roadmap 2',
+			revealed: false
 		},
 		{
 			desc: 'dolor',
-			title: 'roadmap 3'
+			title: 'roadmap 3',
+			revealed: false
 		},
 		{
 			desc: 'sit',
-			title: 'roadmap 4'
+			title: 'roadmap 4',
+			revealed: false
 		},
 		{
 			desc: 'amet',
-			title: 'roadmap 5'
+			title: 'roadmap 5',
+			revealed: false
 		},
 		{
 			desc: 'consectetur',
-			title: 'roadmap 6'
+			title: 'roadmap 6',
+			revealed: false
 		},
 		{
 			desc: 'adipisicing',
-			title: 'roadmap 7'
+			title: 'roadmap 7',
+			revealed: false
 		}
 	];
 </script>
@@ -46,6 +53,7 @@
 >
 	<div class="w-full max-w-7xl pb-4">
 		<div class="divider text-4xl lg:text-6xl font-black text-left"><h1>Roadmap</h1></div>
+		
 	</div>
 	<div class="flex flex-col lg:flex-row relative gap-4 w-full max-w-7xl h-auto lg:h-full">
 		{#if openInfo !== 0}
@@ -68,7 +76,7 @@
 			</div>
 		{/if}
 		{#each roadMaps as roadMap, index}
-			<RoadmapItem on:click={() => openInfo = index + 1} {index} title={roadMap.title} />
+			<RoadmapItem on:click={() => openInfo = index + 1} {index} title={roadMap.title} revealed={roadMap.revealed} />
 		{/each}
 	</div>
 </div>

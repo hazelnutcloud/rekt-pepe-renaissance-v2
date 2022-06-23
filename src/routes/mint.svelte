@@ -204,7 +204,7 @@
 	{/if}
 
 	<div
-		class="flex flex-col md:flex-row gap-8 items-center justify-between mt-10 rounded-lg bg-base-200 p-8 w-full max-w-3xl"
+		class="flex flex-col md:flex-row gap-8 items-start justify-between mt-10 rounded-lg bg-base-200 p-8 w-full max-w-3xl"
 	>
 		<div class="flex-1">
 			<Carousel />
