@@ -1,13 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
 
-	let dark = false;
+	let dark = true;
 	/**
 	 * @type {HTMLElement}
 	 */
 	let html;
 	let theme;
-    let initialDark = false;
+    let initialDark = true;
 
 	onMount(() => {
 		theme = localStorage.getItem('theme');

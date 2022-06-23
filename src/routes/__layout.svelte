@@ -39,7 +39,8 @@
 					class="text-3xl hover:bg-base-300 p-2 rounded-lg hover:shadow-lg hidden lg:block font-serif tracking-wide"
 				>
 					RPR
-				</div></a
+				</div>
+				</a
 			>
 			<div class="flex gap-4">
 				<ThemePicker />

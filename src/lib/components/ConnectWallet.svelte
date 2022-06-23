@@ -18,9 +18,9 @@
 	import UAuthSPA from '@uauth/js';
 
 	const uauthOptions: UAuthWeb3Modal.IUAuthOptions = {
-		clientID: '40ffd3bd-8fa8-4759-af3d-173f482b61d4',
-		redirectUri: 'http://localhost:3000',
-		scope: 'openid wallet'
+		clientID: "40ffd3bd-8fa8-4759-af3d-173f482b61d4",
+		redirectUri: "http://localhost:3000",
+		scope: "openid wallet"
 	};
 
 	const providerOptions = {

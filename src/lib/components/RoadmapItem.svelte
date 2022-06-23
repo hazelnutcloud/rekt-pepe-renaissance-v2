@@ -14,14 +14,17 @@
 </script>
 
 <div
-	class="flex-1 h-full bg-zinc-500 p-4 bg-blend-multiply bg-contain hover:bg-zinc-400 flex flex-col items-start justify-end roadmap-item hover:cursor-pointer text-primary font-bold"
+	class="flex-1 h-full bg-zinc-500 p-4 bg-blend-multiply bg-contain hover:bg-zinc-400 flex flex-col items-start justify-end roadmap-item hover:cursor-pointer text-zinc-300 font-bold"
 	style="--bg-url: url({revealed
 		? '/rektpepes/' + (index + 1) + '.png'
 		: '/rektpepes/silhouettes/' + (index + 1) + '.png'});"
 	in:blur={{ delay: index * 200 + 100 }}
-	on:click|stopPropagation={() => dispatch('click')}
+	on:click|stopPropagation={() => {
+		if (!revealed) return;
+		dispatch('click');
+	}}
 >
-	{title}
+	{revealed ? title : "[REDACTED]"}
 	<Fa icon={faRightLong} />
 </div>
 
