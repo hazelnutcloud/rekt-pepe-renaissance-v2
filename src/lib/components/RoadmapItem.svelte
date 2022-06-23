@@ -14,7 +14,7 @@
 </script>
 
 <div
-	class="lg:flex-1 lg:h-full bg-zinc-500 p-4 bg-blend-multiply bg-contain hover:bg-zinc-400 h-40 flex flex-col items-start justify-end roadmap-item hover:cursor-pointer text-primary font-bold"
+	class="flex-1 h-full bg-zinc-500 p-4 bg-blend-multiply bg-contain hover:bg-zinc-400 flex flex-col items-start justify-end roadmap-item hover:cursor-pointer text-primary font-bold"
 	style="--bg-url: url({revealed
 		? '/rektpepes/' + (index + 1) + '.png'
 		: '/rektpepes/silhouettes/' + (index + 1) + '.png'});"

@@ -27,21 +27,6 @@
 			desc: 'sit',
 			title: 'roadmap 4',
 			revealed: false
-		},
-		{
-			desc: 'amet',
-			title: 'roadmap 5',
-			revealed: false
-		},
-		{
-			desc: 'consectetur',
-			title: 'roadmap 6',
-			revealed: false
-		},
-		{
-			desc: 'adipisicing',
-			title: 'roadmap 7',
-			revealed: false
 		}
 	];
 </script>
@@ -53,9 +38,9 @@
 >
 	<div class="w-full max-w-7xl pb-4">
 		<div class="divider text-4xl lg:text-6xl font-black text-left"><h1>Roadmap</h1></div>
-		
+		<p class="text-center p-4">Rekt Pepe Renaissance is a 100% community-driven project.</p>
 	</div>
-	<div class="flex flex-col lg:flex-row relative gap-4 w-full max-w-7xl h-auto lg:h-full">
+	<div class="grid grid-cols-2 relative gap-4 w-full max-w-7xl h-full">
 		{#if openInfo !== 0}
 			<div
 				class="absolute h-full w-full p-4 bg-base-200"

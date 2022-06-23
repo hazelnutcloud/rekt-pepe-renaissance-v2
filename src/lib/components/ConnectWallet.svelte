@@ -12,29 +12,29 @@
 	import { ethers } from 'ethers';
 	import { onMount } from 'svelte';
 	import Web3Modal from 'web3modal';
-	import CoinBaseWalletSDK from '@coinbase/wallet-sdk'
-	import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js'
+	import CoinBaseWalletSDK from '@coinbase/wallet-sdk';
+	import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js';
 	import * as UAuthWeb3Modal from '@uauth/web3modal';
-	import UAuthSPA from '@uauth/js'
+	import UAuthSPA from '@uauth/js';
 
 	const uauthOptions: UAuthWeb3Modal.IUAuthOptions = {
-		clientID: "40ffd3bd-8fa8-4759-af3d-173f482b61d4",
-		redirectUri: "http://localhost:3000",
-		scope: "openid wallet"
-	}
+		clientID: '40ffd3bd-8fa8-4759-af3d-173f482b61d4',
+		redirectUri: 'http://localhost:3000',
+		scope: 'openid wallet'
+	};
 
 	const providerOptions = {
 		coinbasewallet: {
 			package: CoinBaseWalletSDK,
 			options: {
-				appName: "Rekt Pepe Renaissance",
-				infuraId: "d704cdd9955f4fae94b5b600f39a183c",
+				appName: 'Rekt Pepe Renaissance',
+				infuraId: 'd704cdd9955f4fae94b5b600f39a183c'
 			}
 		},
 		walletconnect: {
 			package: WalletConnectProvider,
 			options: {
-				infuraId: "d704cdd9955f4fae94b5b600f39a183c",
+				infuraId: 'd704cdd9955f4fae94b5b600f39a183c'
 			}
 		},
 		'custom-uauth': {
@@ -65,10 +65,10 @@
 	const changeNetwork = async () => {
 		try {
 			await $provider!.send('wallet_switchEthereumChain', [{ chainId: network }]);
-			checkChainId()
+			checkChainId();
 		} catch (switchError: any) {
 			console.error(switchError);
-			checkChainId()
+			checkChainId();
 		}
 	};
 
@@ -77,7 +77,7 @@
 		web3modalInstance = await web3modal!.connect();
 		$provider = new ethers.providers.Web3Provider(web3modalInstance);
 		$accounts = await $provider!.listAccounts();
-		const udomain = (await new UAuthSPA(uauthOptions).user());
+		const udomain = await new UAuthSPA(uauthOptions).user();
 		if (udomain) {
 			udomainName = udomain.sub;
 		}
@@ -88,23 +88,23 @@
 	const initEthers = () => {
 		checkChainId();
 		web3modalInstance.on('accountsChanged', () => {
-			disconnectWallet()
-		})
+			disconnectWallet();
+		});
 		web3modalInstance.on('chainChanged', () => {
-			checkChainId()
-		})
+			checkChainId();
+		});
 		web3modalInstance.on('disconnect', () => {
-			disconnectWallet()
-		})
+			disconnectWallet();
+		});
 	};
 
 	//check chain id
 	const checkChainId = async () => {
 		const chainId = await $provider!.send('eth_chainId', []);
 		if (chainId !== network) {
-			wrongChain = true
+			wrongChain = true;
 		} else {
-			wrongChain = false
+			wrongChain = false;
 		}
 	};
 
@@ -114,15 +114,15 @@
 			web3modal = new Web3Modal({
 				cacheProvider: true,
 				theme: {
-					background: "hsl(var(--b2))",
-					main: "hsl(var(--bc))",
-					secondary: "hsl(var(--bc))",
-					border: "hsl(var(--b1))",
-					hover: "hsl(var(--b3))"
+					background: 'hsl(var(--b2))',
+					main: 'hsl(var(--bc))',
+					secondary: 'hsl(var(--bc))',
+					border: 'hsl(var(--b1))',
+					hover: 'hsl(var(--b3))'
 				},
 				providerOptions
 			});
-			UAuthWeb3Modal.registerWeb3Modal(web3modal)
+			UAuthWeb3Modal.registerWeb3Modal(web3modal);
 		}
 	};
 
@@ -134,7 +134,7 @@
 	});
 
 	let udomainName: string | undefined;
-	$: displayAddress = udomainName ? udomainName : truncateAddress($accounts[0]);
+	$: displayAddress = udomainName ? udomainName : $accounts[0] ? truncateAddress($accounts[0]) : '';
 </script>
 
 {#if wrongChain}
@@ -155,7 +155,11 @@
 			></label
 		>
 		<ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-			<li><a href="https://opensea.io/{$accounts[0]}" target="_blank"><Fa icon={faWallet} class="pr-2" scale={1.2} />My Wallet</a></li>
+			<li>
+				<a href="https://opensea.io/{$accounts[0]}" target="_blank"
+					><Fa icon={faWallet} class="pr-2" scale={1.2} />My Wallet</a
+				>
+			</li>
 			<li>
 				<p class="text-error" on:click={() => disconnectWallet()}>
 					<Fa icon={faArrowRightFromBracket} class="pr-2" scale={1.2} />Disconnect
